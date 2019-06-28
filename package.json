@@ -10,14 +10,15 @@
   "author": "Rise Vision",
   "license": "GPL-3.0+",
   "scripts": {
-    "build": "polymer build && ./node_modules/common-component/extract-source.sh rise-image",
-    "test": "eslint . && polymer test"
+    "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-image",
+    "test": "eslint . && polymer test",
+    "pretty": "eslint . --fix"
   },
   "dependencies": {
     "@polymer/iron-image": "^3.0.1",
     "@polymer/polymer": "3.1.0",
     "@webcomponents/webcomponentsjs": "^2.1.3",
-    "common-component": "git://github.com/Rise-Vision/common-component.git#v1.16.1"
+    "rise-common-component": "git://github.com/Rise-Vision/rise-common-component.git#v1.0.1"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

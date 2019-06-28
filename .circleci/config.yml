@@ -118,7 +118,7 @@ jobs:
           VERSION=$(cat version-string/version)
           TARGET=$WIDGETS_BASE/staging/components/$COMPONENT_NAME/$VERSION/
           echo Deploying version $VERSION to $COMPONENT_NAME
-          node_modules/common-component/deploy-gcs.sh $COMPONENT_NAME $TARGET
+          node_modules/rise-common-component/scripts/deploy-gcs.sh $COMPONENT_NAME $TARGET
 
   deploy-e2e-page:
     parameters:
@@ -200,7 +200,7 @@ jobs:
           MAJOR=$(grep version package.json | grep -Po '[0-9]+' | head -1)
           TARGET=$WIDGETS_BASE/<< parameters.stage >>/components/$COMPONENT_NAME/$MAJOR/
           echo Deploying << parameters.stage >> version of $COMPONENT_NAME/$MAJOR
-          node_modules/common-component/deploy-gcs.sh $COMPONENT_NAME $TARGET
+          node_modules/rise-common-component/scripts/deploy-gcs.sh $COMPONENT_NAME $TARGET
 
 workflows:
   workflow1:

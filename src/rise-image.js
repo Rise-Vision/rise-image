@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 
-import { PolymerElement } from "@polymer/polymer/polymer-element.js";
+import { RiseElement } from "rise-common-component/src/rise-element.js";
 import { html } from "@polymer/polymer/lib/utils/html-tag.js";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
 import { version } from "./rise-image-version.js";
 import "@polymer/iron-image/iron-image.js";
 
-class RiseImage extends PolymerElement {
+class RiseImage extends RiseElement {
   static get template() {
     return html`
       <style>
@@ -61,14 +61,6 @@ class RiseImage extends PolymerElement {
     ]
   }
 
-  static get EVENT_CONFIGURED() {
-    return "configured";
-  }
-
-  static get EVENT_START() {
-    return "start";
-  }
-
   static get EVENT_IMAGE_ERROR() {
     return "image-error";
   }
@@ -100,6 +92,8 @@ class RiseImage extends PolymerElement {
   constructor() {
     super();
 
+    this._setVersion( version );
+
     this._watchInitiated = false;
     this._initialStart = true;
     this._filesList = [];
@@ -112,16 +106,7 @@ class RiseImage extends PolymerElement {
 
   ready() {
     super.ready();
-
     this._configureImageEventListeners();
-
-    const handleStart = () => this._handleStart();
-
-    this.addEventListener( RiseImage.EVENT_START, handleStart, {
-      once: true
-    });
-
-    this._sendImageEvent( RiseImage.EVENT_CONFIGURED );
   }
 
   _configureImageEventListeners() {
@@ -137,14 +122,6 @@ class RiseImage extends PolymerElement {
       this._log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, { storage: this._getStorageData( filePath, fileUrl ) });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
     });
-  }
-
-  _getComponentData() {
-    return {
-      name: "rise-image",
-      id: this.id,
-      version: version
-    };
   }
 
   _getStorageData( file, url ) {
@@ -445,20 +422,7 @@ class RiseImage extends PolymerElement {
     if ( RisePlayerConfiguration.isPreview()) {
       return;
     }
-
-    const componentData = this._getComponentData();
-
-    switch ( type ) {
-    case RiseImage.LOG_TYPE_INFO:
-      RisePlayerConfiguration.Logger.info( componentData, event, details, additionalFields );
-      break;
-    case RiseImage.LOG_TYPE_WARNING:
-      RisePlayerConfiguration.Logger.warning( componentData, event, details, additionalFields );
-      break;
-    case RiseImage.LOG_TYPE_ERROR:
-      RisePlayerConfiguration.Logger.error( componentData, event, details, additionalFields );
-      break;
-    }
+    super.log( type, event, details, additionalFields );
   }
 
   _handleSingleFileError( message ) {
@@ -539,11 +503,7 @@ class RiseImage extends PolymerElement {
   }
 
   _sendImageEvent( eventName, detail = {}) {
-    const event = new CustomEvent( eventName, {
-      bubbles: true, composed: true, detail
-    });
-
-    this.dispatchEvent( event );
+    super._sendEvent( eventName, detail );
   }
 
 }
