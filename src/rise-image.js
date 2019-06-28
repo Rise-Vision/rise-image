@@ -122,6 +122,12 @@ class RiseImage extends RiseElement {
       this._log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, { storage: this._getStorageData( filePath, fileUrl ) });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
     });
+
+    this.$.image.addEventListener( "loaded-changed", event => {
+      if ( event.detail.value === true ) {
+        super._setUptimeError( false );
+      }
+    });
   }
 
   _getStorageData( file, url ) {
@@ -504,6 +510,16 @@ class RiseImage extends RiseElement {
 
   _sendImageEvent( eventName, detail = {}) {
     super._sendEvent( eventName, detail );
+
+    switch ( eventName ) {
+    case RiseImage.EVENT_IMAGE_ERROR:
+      super._setUptimeError( true );
+      break;
+    case RiseImage.EVENT_IMAGE_RESET:
+      super._setUptimeError( false );
+      break;
+    default:
+    }
   }
 
 }

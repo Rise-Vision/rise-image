@@ -280,6 +280,58 @@
             } );
           } );
         } );
+
+       suite( "uptime", () => {
+          let sandbox = sinon.createSandbox();
+
+          setup( () => {
+            sandbox.stub(element.__proto__.__proto__, '_setUptimeError');
+            sandbox.stub(element.$, 'image');
+          });
+
+          teardown( () => {
+            sandbox.restore();
+          });
+
+          test("should default to no uptime error", () => {
+            assert.isFalse( element._setUptimeError.called );
+          });
+
+          test("should set uptime error when raising image-error", () => {
+            element._sendImageEvent("image-error");
+            assert.isTrue( element._setUptimeError.called );
+            assert.isTrue( element._setUptimeError.calledWith(true) );
+          });
+
+          test("should report no uptime error on reset", () => {
+            element._sendImageEvent("image-reset");
+            assert.isTrue( element._setUptimeError.called );
+            assert.isTrue( element._setUptimeError.calledWith(false) );
+          });
+
+          test("should not change uptime error status on other events", () => {
+            element._sendImageEvent("configured");
+            assert.isFalse( element._setUptimeError.called );
+          });
+
+          test("should report no uptime error when image is loaded", done => {
+            element.$.image.dispatchEvent( new CustomEvent( "loaded-changed", { detail: { value: true } }));
+            setTimeout(() => {
+              assert.isTrue( element._setUptimeError.called );
+              assert.isTrue( element._setUptimeError.calledWith(false) );
+              done();
+            },10);
+          });
+
+          test("should not call _setUptimeError if value of 'loaded' is false", done => {
+            element.$.image.dispatchEvent( new CustomEvent( "loaded-changed", { detail: { value: false } }));
+            setTimeout(() => {
+              assert.isFalse( element._setUptimeError.called );
+              done();
+            },10);
+          });
+
+        });
       });
 
     </script>
