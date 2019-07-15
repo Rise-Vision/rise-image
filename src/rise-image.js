@@ -301,7 +301,7 @@ class RiseImage extends RiseElement {
 
   _onShowImageComplete() {
     if ( this._isDone()) {
-      return this._sendDoneEvent( true );
+      return super._sendDoneEvent( true );
     }
 
     if ( this._transitionIndex < ( this._filesToRenderList.length - 1 )) {
@@ -320,7 +320,7 @@ class RiseImage extends RiseElement {
 
     if ( !isNaN( this.duration ) && this.duration !== 0 ) {
       timeOut.cancel( this._transitionTimer );
-      this._transitionTimer = timeOut.run( this._onShowImageComplete.bind( this ), this.duration * 1000 );
+      this._transitionTimer = timeOut.run(() => this._onShowImageComplete(), this.duration * 1000 );
     }
   }
 
@@ -329,7 +329,7 @@ class RiseImage extends RiseElement {
       const duration = parseInt( this.duration, 10 ) || 10;
 
       timeOut.cancel( this._transitionTimer );
-      this._transitionTimer = timeOut.run( this._sendDoneEvent.bind( this, [ true ]), duration * 1000 );
+      this._transitionTimer = timeOut.run(() => super._sendDoneEvent( true ), duration * 1000 );
     }
   }
 
@@ -551,10 +551,6 @@ class RiseImage extends RiseElement {
     if ( status.toUpperCase() === "CURRENT" ) {
       this._configureShowingImages();
     }
-  }
-
-  _sendDoneEvent( done ) {
-    super._sendEvent( "report-done", { done });
   }
 
   _sendImageEvent( eventName, detail = {}) {
