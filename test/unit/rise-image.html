@@ -368,7 +368,7 @@
             const sandbox = sinon.createSandbox();
 
             setup( () => {
-              sandbox.stub(element, '_sendDoneEvent');
+              sandbox.stub(element.__proto__.__proto__, '_sendDoneEvent');
             });
 
             teardown( () => {
