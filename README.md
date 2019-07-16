@@ -64,8 +64,7 @@ The resulting GCS path is: risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f
 - **position**: ( string ): Determines how the image is aligned within the element bounds when _sizing_ is applied. Valid values correspond to the CSS background-position property. Defaults to "center".
 - **responsive**: ( boolean / non-value attribute ): Applies responsive sizing to the image(s) which will respond to instance parent `<div>` container. When _responsive_ is used, the component will ignore any "width", "height", "sizing", or "position" attribute values
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the template editor.
-
-
+- **play-until-done**: ( empty / optional ): If present, it indicates this component will send the `"report-done"` event when if finishes showing the images.
 
 
 ### Events
@@ -78,6 +77,12 @@ The component sends the following events:
 The component is listening for the following events:
 
 - **_start_**: This event will initiate accessing the image. It can be dispatched on the component when _configured_ event has been fired as that event indicates the component has initialized what it requires to and is ready to make a request to the Financial server to retrieve data.
+
+### Play Until Done
+
+When configured with the `play-until-done` attribute the component checks if it is done on every image transition and sends the `"report-done"` event to the template.
+
+If there is a single image configured in `files` or no image at all the event is sent after the time configured in the `duration` attribute or 10 seconds if no duration is set.
 
 ### Logs to BQ
 
