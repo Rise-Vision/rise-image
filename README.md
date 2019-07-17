@@ -20,7 +20,7 @@ There is no need to configure listeners if the component runs as editable ( defa
     <div id="image-sample-container">
       <rise-image
         id="rise-image-sample"
-        files="risemedialibrary-abc123/file1.png|risemedialibrary-abc123/file2.png|risemedialibrary-abc123/file3.png"
+        files='["risemedialibrary-abc123/file1.png", "risemedialibrary-abc123/file2.png", "risemedialibrary-abc123/file3.png"]'
         duration="5"
         responsive>
       </rise-image>
@@ -39,7 +39,7 @@ This attribute holds a literal value, for example:
 ```
   <rise-image id="rise-image-sample"
     label="Sample"
-    files="risemedialibrary-abc123/logo.png">
+    files='["risemedialibrary-abc123/logo.png"]'>
   </rise-image>
 ```
 
@@ -51,7 +51,7 @@ This component receives the following list of attributes:
 
 - **id**: ( string / required ): Unique HTML id with format 'rise-image-<NAME_OR_NUMBER>'.
 - **label**: ( string ): An optional label key for the text that will appear in the template editor. See 'Labels' section above.
-- **files** ( string / required ): List of image file paths separated by pipe symbol. A file path must be a valid GCS file path. A folder path will not be valid. For example, this is a default folder path from Rise Storage:
+- **files** ( array / required ): List of image file paths applied in JSON format (see [Polymer documentation](https://polymer-library.polymer-project.org/3.0/docs/devguide/properties#configuring-object-and-array-properties) for configuring Array properties). A file path must be a valid GCS file path. A folder path will not be valid. For example, this is a default folder path from Rise Storage:
 https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/Template%20Library/Global%20Assets/logo-white.png.
 To create a valid GCS path, remove *https://storage.googleapis.com/* and replace *%20* with a space.
 The resulting GCS path is: risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/Template Library/Global Assets/logo-white.png.

@@ -31,7 +31,7 @@
           height="240"
           sizing="contain"
           position="top"
-          files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png">
+          files='["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png"]'>
         </rise-image>
     </template>
 </test-fixture>
@@ -77,7 +77,7 @@
 
       assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 0 ], componentData );
       assert.equal( RisePlayerConfiguration.Logger.info.args[ 0 ][ 1 ], "start");
-      assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], { files: SAMPLE_PATH } );
+      assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], { files: [SAMPLE_PATH] } );
     });
 
     test( "should log an 'image-rls-error' event when FILE-ERROR is received", () => {
@@ -107,7 +107,7 @@
     });
 
     test( "should log an 'image-format-invalid' event when file type is invalid", () => {
-        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
+        element.files = ["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt"];
 
         element.dispatchEvent( new CustomEvent( "start" ));
 
@@ -130,11 +130,11 @@
         element.dispatchEvent( new CustomEvent( "start" ));
 
         sinon.stub( element, "_start" );
-        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png";
+        element.files = ["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png"];
 
         assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.info.args[ 1 ][ 1 ], "image-reset");
-        assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ], { files: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png" } );
+        assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ], { files: ["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png"] } );
 
         element._start.restore();
     } );
@@ -148,7 +148,7 @@
             }
         };
 
-          element.files = filePath;
+          element.files = [filePath];
           element.dispatchEvent( new CustomEvent( "start" ));
 
           setTimeout(() => {
@@ -182,7 +182,7 @@
             }
         };
 
-        element.files = "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg";
+        element.files = ["risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg"];
         element.dispatchEvent( new CustomEvent( "start" ));
 
         setTimeout( () => {
