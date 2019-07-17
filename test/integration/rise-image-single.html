@@ -30,7 +30,7 @@
       height="240"
       sizing="contain"
       position="top"
-      files='["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png"]'>
+      files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png">
     </rise-image>
   </template>
 </test-fixture>
@@ -88,7 +88,7 @@
       test('it should not render image when file type is invalid', () => {
         let spy = sinon.spy( element, "_renderImage" );
 
-        element.files = ["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt"];
+        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
 
         element.dispatchEvent( new CustomEvent( "start" ) );
 
@@ -139,7 +139,7 @@
           done();
         });
 
-        element.files = ["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt"];
+        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
 
         element.dispatchEvent( new CustomEvent( "start" ) );
       });
@@ -167,7 +167,7 @@
           }
         };
 
-        element.files = [svgFilePath];
+        element.files = svgFilePath;
 
         element.dispatchEvent( new CustomEvent( "start" ) );
       })
@@ -185,7 +185,7 @@
       test('it should render image', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( SAMPLE_PATH )}`);
+        assert.equal(element.$.image.src, SAMPLE_URL);
       });
 
     });
