@@ -40,7 +40,7 @@
     <rise-image
       duration="5"
       responsive
-      files='["risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif","risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/blue-jays-logo.jpg","risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/raptors_logo.png"]'>
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/blue-jays-logo.jpg|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/raptors_logo.png">
     </rise-image>
   </template>
 </test-fixture>
@@ -336,21 +336,21 @@
       test('it should render first image', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 0 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 0 ].url);
       });
 
       test('it should start transition timer for two images and show each for 5 seconds', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 0 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 0 ].url);
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 1 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 1 ].url);
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 2 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 2 ].url);
       });
 
       test('it should transition all three images', () => {
@@ -359,11 +359,11 @@
         // emulate first two images cycle and first two images shown again in the following cycle
         clock.tick( 20000 );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 1 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 1 ].url);
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, `https://storage.googleapis.com/${ encodeURIComponent( testFiles[ 2 ].path )}`);
+        assert.equal(element.$.image.src, testFiles[ 2 ].url);
       });
 
     });

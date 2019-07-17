@@ -23,10 +23,8 @@ class RiseImage extends RiseElement {
   static get properties() {
     return {
       files: {
-        type: Array,
-        value: () => {
-          return [];
-        }
+        type: String,
+        value: ""
       },
       metadata: {
         type: Array,
@@ -116,14 +114,6 @@ class RiseImage extends RiseElement {
 
     this.addEventListener( "rise-presentation-play", () => this._reset());
     this.addEventListener( "rise-presentation-stop", () => this._stop());
-  }
-
-  _deserializeValue( value, type ) {
-    if ( type === Array && value.charAt( 0 ) !== "[" && value.charAt( value.length - 1 ) !== "]" ) {
-      return this._convertFilesStringToArray( value );
-    } else {
-      return super._deserializeValue( value, type );
-    }
   }
 
   _configureImageEventListeners() {
@@ -239,21 +229,17 @@ class RiseImage extends RiseElement {
     });
   }
 
-  _convertFilesStringToArray( files ) {
-    // single file
-    if ( files.indexOf( "|" ) === -1 ) {
-      return [ files ];
-    }
-
-    return files.split( "|" );
-  }
-
   _isValidFiles( files ) {
-    if ( !files || !Array.isArray( files )) {
+    if ( !files || typeof files !== "string" ) {
       return false;
     }
 
-    return files.length > 0 && files.indexOf( "" ) === -1;
+    // single symbol
+    if ( files.indexOf( "|" ) === -1 ) {
+      return true;
+    }
+
+    return files.split( "|" ).indexOf( "" ) === -1;
   }
 
   _filterInvalidFileTypes( files ) {
@@ -418,7 +404,7 @@ class RiseImage extends RiseElement {
       return this._startEmptyPlayUntilDoneTimer();
     }
 
-    this._filesList = this._filterInvalidFileTypes( this.files );
+    this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
 
     if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
       return this._startEmptyPlayUntilDoneTimer();
@@ -468,7 +454,7 @@ class RiseImage extends RiseElement {
   _handleStartForPreview() {
     this._filesList.forEach( file => this._handleImageStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ),
+      fileUrl: RiseImage.STORAGE_PREFIX + file,
       status: this._previewStatusFor( file )
     }));
   }
