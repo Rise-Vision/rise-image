@@ -77,7 +77,7 @@
 
       assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 0 ], componentData );
       assert.equal( RisePlayerConfiguration.Logger.info.args[ 0 ][ 1 ], "start");
-        assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], { files: SAMPLE_PATH } );
+      assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], { files: SAMPLE_PATH } );
     });
 
     test( "should log an 'image-rls-error' event when FILE-ERROR is received", () => {
