@@ -30,7 +30,7 @@
           height="240"
           sizing="contain"
           position="top"
-          files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png">
+          files='["risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png"]'>
         </rise-image>
       </template>
     </test-fixture>
@@ -50,26 +50,19 @@
         });
 
         suite( "_isValidFiles", () => {
-          test( "should return true if 'files' attribute is a non-empty String", () => {
-            assert.isTrue( element._isValidFiles( "test" ) );
+          test( "should return true if 'files' attribute is not empty", () => {
+            assert.isTrue( element._isValidFiles( ["test1.jpg", "test2.jpg"] ) );
           } );
 
-          test( "should return false if 'files' attribute is not a String or empty String", () => {
-            assert.isFalse( element._isValidFiles( 123 ) );
-            assert.isFalse( element._isValidFiles( ["test1|test2"] ) );
+          test( "should return false if 'files' attribute is empty or is an empty Array", () => {
+            assert.isFalse( element._isValidFiles( [] ) );
             assert.isFalse( element._isValidFiles( "" ) );
           } );
 
-          test( "should return true if 'files' attribute is a String containing values separated by '|'", () => {
-            assert.isTrue( element._isValidFiles( "test1|test2|test3" ) );
+          test( "should return false if 'files' attribute contains an item with an empty value", () => {
+            assert.isFalse( element._isValidFiles( ["test1.jpg","", "test2.jpg"] ) );
           } );
 
-          test( "should return false if 'files' attribute contains '|' with any empty value", () => {
-            assert.isFalse(element._isValidFiles("test|"));
-            assert.isFalse(element._isValidFiles("|test"));
-            assert.isFalse(element._isValidFiles("|"));
-            assert.isFalse(element._isValidFiles("test1|test2||test3"));
-          } );
         } );
 
         suite( "_getStorageFileFormat", () => {
@@ -255,7 +248,7 @@
 
             assert.isTrue( element._handleImageStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: `https://storage.googleapis.com/${encodeURIComponent( "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" )}`,
               status: "current"
             } ));
           } );
@@ -266,19 +259,19 @@
 
             assert.deepEqual( element._handleImageStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png",
+              fileUrl: `https://storage.googleapis.com/${encodeURIComponent( "risemedialibrary-abc123/test1.png" )}`,
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png",
+              fileUrl: `https://storage.googleapis.com/${encodeURIComponent( "risemedialibrary-abc123/test2.png" )}`,
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png",
+              fileUrl: `https://storage.googleapis.com/${encodeURIComponent( "risemedialibrary-abc123/test3.png" )}`,
               status: "current"
             } );
           } );
@@ -412,7 +405,7 @@
             test("should start empty play until done timer on invalid files list", () => {
               element.setAttribute( "play-until-done", true);
 
-              element.files = "risemedialibrary-abc123/README.md";
+              element.files = ["risemedialibrary-abc123/README.md"];
 
               element._start();
 
