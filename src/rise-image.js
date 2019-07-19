@@ -240,6 +240,7 @@ class RiseImage extends RiseElement {
   }
 
   _convertFilesStringToArray( files ) {
+    console.log( "_convertFilesStringToArray", files );
     // single file
     if ( files.indexOf( "|" ) === -1 ) {
       return [ files ];
@@ -249,6 +250,7 @@ class RiseImage extends RiseElement {
   }
 
   _isValidFiles( files ) {
+    console.log( "_isValidFiles", files );
     if ( !files || !Array.isArray( files )) {
       return false;
     }
@@ -339,6 +341,7 @@ class RiseImage extends RiseElement {
   }
 
   _startEmptyPlayUntilDoneTimer() {
+    console.log( "_startEmptyPlayUntilDoneTimer" );
     if ( this.hasAttribute( "play-until-done" )) {
       const duration = parseInt( this.duration, 10 ) || 10;
 
