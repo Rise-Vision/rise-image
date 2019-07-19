@@ -177,6 +177,7 @@ class RiseImage extends RiseElement {
   }
 
   _reset() {
+    console.log( "_reset", this._initialStart );
     if ( !this._initialStart ) {
 
       this._stop();
