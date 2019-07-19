@@ -4,6 +4,8 @@
 
 This needs to be done just once per machine.
 
+Testing the PR template 
+
 ```bash
 npm install -g polymer-cli@1.9.7
 ```
