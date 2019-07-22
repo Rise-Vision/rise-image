@@ -108,6 +108,7 @@ class RiseImage extends RiseElement {
     this._filesToRenderList = [];
     this._transitionIndex = 0;
     this._transitionTimer = null;
+    this._avoidResetFromFilesConversion = false;
   }
 
   ready() {
@@ -179,6 +180,10 @@ class RiseImage extends RiseElement {
   _reset() {
     console.log( "_reset", this._initialStart );
     if ( !this._initialStart ) {
+      if ( this._avoidResetFromFilesConversion ) {
+        this._avoidResetFromFilesConversion = false;
+        return;
+      }
 
       this._stop();
 
@@ -250,13 +255,19 @@ class RiseImage extends RiseElement {
     return files.split( "|" );
   }
 
-  _isValidFiles( files ) {
-    console.log( "_isValidFiles", files );
-    if ( !files || !Array.isArray( files )) {
+  _isValidFiles() {
+    console.log( "_isValidFiles", this.files );
+    if ( !this.files ) {
       return false;
     }
 
-    return files.length > 0 && files.indexOf( "" ) === -1;
+    if ( typeof this.files === "string" ) {
+      // account for existing attribute data overriding files value (with String datatype value) **after** deserialization occurred
+      this._avoidResetFromFilesConversion = true;
+      this.files = this._convertFilesStringToArray( this.files );
+    }
+
+    return this.files.length > 0 && this.files.indexOf( "" ) === -1;
   }
 
   _filterInvalidFileTypes( files ) {
@@ -418,7 +429,7 @@ class RiseImage extends RiseElement {
   }
 
   _start() {
-    if ( !this._isValidFiles( this.files )) {
+    if ( !this._isValidFiles()) {
       return this._startEmptyPlayUntilDoneTimer();
     }
 
