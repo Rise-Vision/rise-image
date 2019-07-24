@@ -1,6 +1,6 @@
 {
   "name": "rise-image",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web component built for Templates to display an image from Storage",
   "repository": "https://github.com/Rise-vision/rise-image.git",
   "bugs": {
