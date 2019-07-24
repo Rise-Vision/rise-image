@@ -438,23 +438,44 @@ class RiseImage extends RiseElement {
     this._transitionIndex = 0;
   }
 
-  _previewStatusFor( file ) {
+  _hasMetadata() {
     // Metadata may not be present if no data updates have been received yet.
-    const hasMetadata = this.metadata && this.metadata.length > 0;
+    return this.metadata && this.metadata.length > 0;
+  }
+
+  _metadataEntryFor( file ) {
+    return this.metadata.find( current => current.file === file );
+  }
+
+  _previewStatusFor( file ) {
+    const hasMetadata = this._hasMetadata();
 
     if ( !hasMetadata ) {
       return "current";
     }
 
-    const entry = this.metadata.find( current => current.file === file );
+    const entry = this._metadataEntryFor( file );
 
     return entry && entry.exists ? "current" : "deleted";
+  }
+
+  _timeCreatedFor( file ) {
+    const hasMetadata = this._hasMetadata();
+
+    if ( !hasMetadata ) {
+      return "";
+    }
+
+    const entry = this._metadataEntryFor( file );
+
+    return entry && entry[ "time-created" ] ? entry[ "time-created" ] : "";
   }
 
   _handleStartForPreview() {
     this._filesList.forEach( file => this._handleImageStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + file,
+      fileUrl: RiseImage.STORAGE_PREFIX + file + "?_=" +
+        this._timeCreatedFor( file ),
       status: this._previewStatusFor( file )
     }));
   }

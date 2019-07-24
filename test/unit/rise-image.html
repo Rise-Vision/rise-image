@@ -255,7 +255,7 @@
 
             assert.isTrue( element._handleImageStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=",
               status: "current"
             } ));
           } );
@@ -266,19 +266,19 @@
 
             assert.deepEqual( element._handleImageStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=",
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png?_=",
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png?_=",
               status: "current"
             } );
           } );

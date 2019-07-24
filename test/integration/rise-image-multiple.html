@@ -336,21 +336,21 @@
       test('it should render first image', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, testFiles[ 0 ].url);
+        assert.equal(element.$.image.src, testFiles[ 0 ].url + "?_=");
       });
 
       test('it should start transition timer for two images and show each for 5 seconds', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, testFiles[ 0 ].url);
+        assert.equal(element.$.image.src, testFiles[ 0 ].url + "?_=");
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, testFiles[ 1 ].url);
+        assert.equal(element.$.image.src, testFiles[ 1 ].url + "?_=");
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, testFiles[ 2 ].url);
+        assert.equal(element.$.image.src, testFiles[ 2 ].url + "?_=");
       });
 
       test('it should transition all three images', () => {
@@ -359,11 +359,11 @@
         // emulate first two images cycle and first two images shown again in the following cycle
         clock.tick( 20000 );
 
-        assert.equal(element.$.image.src, testFiles[ 1 ].url);
+        assert.equal(element.$.image.src, testFiles[ 1 ].url + "?_=");
 
         clock.tick( 5000 );
 
-        assert.equal(element.$.image.src, testFiles[ 2 ].url);
+        assert.equal(element.$.image.src, testFiles[ 2 ].url + "?_=");
       });
 
     });
