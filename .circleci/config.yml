@@ -42,7 +42,7 @@ jobs:
       - restore_cache:
           key: node-cache-{{ checksum "package.json" }}
       - run: |
-          VERSION=$(cat version-string/version)
+          VERSION=$(grep version package.json | grep -o '[0-9.]*')
           sed -i "
             s/__VERSION__/$VERSION/;
           " src/rise-image-version.js
