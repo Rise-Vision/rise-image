@@ -246,6 +246,8 @@
           });
 
           teardown( () => {
+            element.metadata = null;
+
             element._handleImageStatusUpdated.restore();
           } );
 
@@ -282,6 +284,22 @@
               status: "current"
             } );
           } );
+
+          test( "should call _handleImageStatusUpdated with correct data and time created", () => {
+            const file = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png";
+            element._filesList = [ file ];
+            element.metadata = [
+              { file, exists: true, "time-created": 123 }
+            ];
+            element._handleStartForPreview();
+
+            assert.isTrue( element._handleImageStatusUpdated.calledWith({
+              filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=123",
+              status: "current"
+            } ));
+          } );
+
         } );
 
        suite( "uptime", () => {
@@ -336,7 +354,7 @@
 
         });
 
-        suite( "Play Unitl Done", () => {
+        suite( "Play Until Done", () => {
 
           suite( "_isDone()", () => {
 
