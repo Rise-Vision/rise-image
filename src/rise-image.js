@@ -258,8 +258,9 @@ class RiseImage extends RiseElement {
       return false;
     }
 
+    // account for existing attribute data overriding files value (with String datatype value) **after** deserialization occurred
     if ( typeof this.files === "string" ) {
-      // account for existing attribute data overriding files value (with String datatype value) **after** deserialization occurred
+      // set flag for _reset() handler to check in order to prevent executing reset operations from observing the below 'files' value change
       this._avoidResetFromFilesConversion = true;
       this.files = this._convertFilesStringToArray( this.files );
     }

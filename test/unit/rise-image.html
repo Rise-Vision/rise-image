@@ -66,6 +66,12 @@
             assert.isFalse( element._isValidFiles() );
           } );
 
+          test( "should return true if 'files' was overwritten to be of String data type", () => {
+            element.files= "test1.jpg|test2.jpg|test3.jpg";
+            assert.isTrue( element._isValidFiles() );
+            assert.deepEqual( element.files, ["test1.jpg", "test2.jpg", "test3.jpg"] );
+          } );
+
         } );
 
         suite( "_getStorageFileFormat", () => {
@@ -186,6 +192,21 @@
             assert.equal( element._transitionIndex, 0 );
             assert.isTrue( element._clearDisplayedImage.called );
             assert.isTrue( element._start.calledOnce );
+          } );
+
+          test( "should not execute any reset operations if '_avoidResetFromFilesConversion' flag set", () => {
+            sinon.spy( element, "_stop" );
+
+            element._initialStart = false;
+            element._watchInitiated = true;
+            element._filesList = [ SAMPLE_PATH ];
+
+            element._avoidResetFromFilesConversion = true;
+            element._reset();
+
+            element._filesList = [ SAMPLE_PATH ];
+            assert.isTrue( element._stop.notCalled );
+            assert.isTrue( element._start.notCalled );
           } );
 
         } );
