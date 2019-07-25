@@ -178,7 +178,6 @@ class RiseImage extends RiseElement {
   }
 
   _reset() {
-    console.log( "_reset", this._initialStart );
     if ( !this._initialStart ) {
       if ( this._avoidResetFromFilesConversion ) {
         this._avoidResetFromFilesConversion = false;
@@ -246,7 +245,6 @@ class RiseImage extends RiseElement {
   }
 
   _convertFilesStringToArray( files ) {
-    console.log( "_convertFilesStringToArray", files );
     // single file
     if ( files.indexOf( "|" ) === -1 ) {
       return [ files ];
@@ -256,7 +254,6 @@ class RiseImage extends RiseElement {
   }
 
   _isValidFiles() {
-    console.log( "_isValidFiles", this.files );
     if ( !this.files ) {
       return false;
     }
@@ -353,7 +350,6 @@ class RiseImage extends RiseElement {
   }
 
   _startEmptyPlayUntilDoneTimer() {
-    console.log( "_startEmptyPlayUntilDoneTimer" );
     if ( this.hasAttribute( "play-until-done" )) {
       const duration = parseInt( this.duration, 10 ) || 10;
 
