@@ -400,6 +400,13 @@ class RiseImage extends RiseElement {
   }
 
   _start() {
+    // Metadata may not be present if no data updates have been received yet.
+    const hasMetadata = this.metadata && this.metadata.length > 0;
+
+    if ( hasMetadata ) {
+      
+    }
+
     if ( !this._isValidFiles( this.files )) {
       return this._startEmptyPlayUntilDoneTimer();
     }
