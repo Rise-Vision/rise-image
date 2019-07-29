@@ -168,10 +168,14 @@ class RiseImage extends RiseElement {
 
   _reset() {
     if ( !this._initialStart ) {
+      const hasMetadata = this.metadata && this.metadata.length > 0;
+      const filesToLog = !hasMetadata ? this.files : this.metadata.map(( entry ) => {
+        return entry.file;
+      });
 
       this._stop();
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: this.files });
+      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: filesToLog });
       this._start();
     }
   }
@@ -227,6 +231,15 @@ class RiseImage extends RiseElement {
       xhr.responseType = "blob";
       xhr.send();
     });
+  }
+
+  _convertFilesStringToArray( files ) {
+    // single file
+    if ( files.indexOf( "|" ) === -1 ) {
+      return [ files ];
+    }
+
+    return files.split( "|" );
   }
 
   _isValidFiles( files ) {
@@ -403,15 +416,26 @@ class RiseImage extends RiseElement {
     // Metadata may not be present if no data updates have been received yet.
     const hasMetadata = this.metadata && this.metadata.length > 0;
 
-    if ( hasMetadata ) {
-      
-    }
+    if ( !hasMetadata ) {
+      if ( !this._isValidFiles( this.files )) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
 
-    if ( !this._isValidFiles( this.files )) {
-      return this._startEmptyPlayUntilDoneTimer();
-    }
+      this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
+    } else {
+      const filesArray = this.metadata.map(( entry ) => {
+        return entry.file;
+      });
 
-    this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
+      console.log( "metadata files array", filesArray );
+
+      // validate metadata files
+      if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
+
+      this._filesList = this._filterInvalidFileTypes( filesArray );
+    }
 
     if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
       return this._startEmptyPlayUntilDoneTimer();
@@ -461,7 +485,7 @@ class RiseImage extends RiseElement {
   _handleStartForPreview() {
     this._filesList.forEach( file => this._handleImageStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + file,
+      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ),
       status: this._previewStatusFor( file )
     }));
   }
