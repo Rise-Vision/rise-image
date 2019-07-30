@@ -50,6 +50,16 @@ class RiseImage extends RiseElement {
         type: Boolean,
         value: false
       },
+      isLogo: {
+        type: Boolean,
+        value: false,
+        observer: "_isLogoChanged"
+      },
+      logoFile: {
+        type: String,
+        value: "",
+        readOnly: true
+      },
       duration: {
         type: Number,
         value: 10
@@ -61,7 +71,7 @@ class RiseImage extends RiseElement {
   // a comma-separated list of one or more dependencies.
   static get observers() {
     return [
-      "_reset(files, metadata, duration)"
+      "_reset(files, logoFile, metadata, duration)"
     ]
   }
 
@@ -166,12 +176,26 @@ class RiseImage extends RiseElement {
     return this._filesToRenderList.find( file => file.filePath === filePath );
   }
 
+  _isLogoChanged() {
+    if ( this.isLogo ) {
+      if ( !this._logoHandler ) {
+        this._logoHandler = RisePlayerConfiguration.Branding.watchLogoFile( logoFile => {
+          this._setLogoFile( logoFile );
+        });
+      }
+    } else {
+      this._logoHandler && this._logoHandler();
+
+      this._setLogoFile( "" );
+    }
+  }
+
   _reset() {
     if ( !this._initialStart ) {
 
       this._stop();
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: this.files });
+      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: this.files, isLogo: this.isLogo, logoFile: this.logoFile });
       this._start();
     }
   }
@@ -400,11 +424,13 @@ class RiseImage extends RiseElement {
   }
 
   _start() {
-    if ( !this._isValidFiles( this.files )) {
+    var files = this.logoFile || this.files;
+
+    if ( !this._isValidFiles( files )) {
       return this._startEmptyPlayUntilDoneTimer();
     }
 
-    this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
+    this._filesList = this._filterInvalidFileTypes( files.split( "|" ));
 
     if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
       return this._startEmptyPlayUntilDoneTimer();
@@ -463,7 +489,7 @@ class RiseImage extends RiseElement {
     if ( this._initialStart ) {
       this._initialStart = false;
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, { files: this.files });
+      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, { files: this.files, isLogo: this.isLogo, logoFile: this.logoFile });
 
       this._start();
     }

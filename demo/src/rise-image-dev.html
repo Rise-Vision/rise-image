@@ -1,0 +1,181 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
+    <!-- <script src="https://widgets.risevision.com/beta/common/config-test.min.js"></script> -->
+    <!-- <script src="https://widgets.risevision.com/beta/common/common-template.min.js"></script> -->
+    <script src="../../src/rise-image.js" type="module"></script>
+    <style>
+      #image01Wrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        background-color: beige;
+      }
+
+      #image02Wrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        background-color: darkgrey;
+      }
+
+      #image02Wrapper > rise-image {
+        background-color: cadetblue;
+      }
+
+      #image03Wrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        background-color: aqua;
+      }
+
+      #image04Wrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        background-color: coral;
+      }
+
+      #image04Wrapper > rise-image {
+        background-color: cornflowerblue;
+      }
+    </style>
+  </head>
+  <body>
+  <ul id="log">
+  </ul>
+
+  <p>Responsive</p>
+  <div id="image01Wrapper">
+    <rise-image
+      id="rise-image-01"
+      label="My Image"
+      responsive
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Costa Rican Frog.jpg">
+    </rise-image>
+  </div>
+
+  <p>Fixed - 300 x 200 - SVG</p>
+  <div id="image02Wrapper">
+    <rise-image
+      id="rise-image-02"
+      label="SVG Image"
+      width="300"
+      height="200"
+      sizing="contain"
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg">
+    </rise-image>
+  </div>
+
+  <p>Responsive - Multiple files</p>
+  <div id="image03Wrapper">
+    <rise-image
+      id="rise-image-03"
+      label="My Image"
+      duration="5"
+      responsive
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Pensive Parakeet.jpg|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Boston City Flow.jpg|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/blue-jays-logo.jpg|risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/raptors_logo.png">
+    </rise-image>
+  </div>
+
+  <p>Fixed - Position, top right</p>
+  <div id="image04Wrapper">
+    <rise-image
+      id="rise-image-04"
+      label="SVG Image"
+      width="300"
+      height="200"
+      sizing="contain"
+      position="top right"
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png">
+    </rise-image>
+  </div>
+
+  <p>Logo</p>
+  <div id="image01Wrapper">
+    <rise-image
+      id="rise-image-logo"
+      label="My Image"
+      is-logo="true"
+      responsive
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Costa Rican Frog.jpg">
+    </rise-image>
+  </div>
+
+<script>
+  window.RisePlayerConfiguration = {
+    watchLogoFileCallback: null,
+    isConfigured: function(){return false},
+    isPreview: function(){return false},
+    LocalStorage: {
+      watchSingleFile: function(file, callback) {
+        callback({
+          status: "CURRENT",
+          filePath: file,
+          fileUrl: "https://storage.googleapis.com/" + file
+        })
+      }
+    },
+    Branding: {
+      watchLogoFile: function(callback){
+        RisePlayerConfiguration.watchLogoFileCallback = callback;
+        // callback("");
+        callback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");
+      }
+    },
+    Logger: {
+      info: _logFromLogger,
+      warning: _logFromLogger,
+      error: _logFromLogger
+    }
+  }
+  
+  function log(text) {
+    console.log(text);
+    var ul = document.getElementById("log");
+    var li = document.createElement("li");
+    li.appendChild(document.createTextNode(text));
+    ul.appendChild(li);
+  }
+
+  function _logFromLogger(componentData, event, details, additionalFields) {
+    log(event + " - " + componentData.id + " - " + JSON.stringify(details));
+  }
+
+  function configureComponents(elementId) {
+    const imageElement = document.querySelector(elementId);
+
+    imageElement.addEventListener( "image-error", ( evt ) => {
+      log( "image 1 error" + evt.detail );
+    } );
+
+    imageElement.addEventListener( "configured", ( evt ) => {
+      log( "configured - " + elementId + " - " + JSON.stringify(evt.detail) );
+      imageElement.dispatchEvent( new Event('start') );
+    } );
+  }
+
+  configureComponents('#rise-image-01');
+  configureComponents('#rise-image-02');
+  configureComponents('#rise-image-03');
+  configureComponents('#rise-image-04');
+  configureComponents('#rise-image-logo');
+
+  // Uncomment if testing directly in browser
+  // [ image01, image02, image03, image04 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
+
+  setTimeout(function() {
+    window.dispatchEvent( new Event('rise-components-ready') );
+  }, 500);
+
+  log('started');
+</script>  
+
+</body>
+</html>

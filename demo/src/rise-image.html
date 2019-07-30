@@ -116,12 +116,24 @@
     </rise-image>
   </div>
 
+  <p>Logo</p>
+  <div id="image01Wrapper">
+    <rise-image
+      id="rise-image-logo"
+      label="My Image"
+      is-logo="true"
+      responsive
+      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Costa Rican Frog.jpg">
+    </rise-image>
+  </div>
+
   <script>
     function configureComponents() {
       const image01 = document.querySelector('#rise-image-01'),
         image02 = document.querySelector('#rise-image-02'),
         image03 = document.querySelector('#rise-image-03'),
-        image04 = document.querySelector('#rise-image-04');
+        image04 = document.querySelector('#rise-image-04'),
+        imageLogo = document.querySelector('#rise-image-logo');
 
       image01.addEventListener( "image-error", ( evt ) => {
         console.log( "image 1 error", evt.detail );
@@ -139,11 +151,19 @@
         console.log( "image 4 error", evt.detail );
       } );
 
+      image04.addEventListener( "image-error", ( evt ) => {
+        console.log( "image 4 error", evt.detail );
+      } );
+
+      imageLogo.addEventListener( "image-error", ( evt ) => {
+        console.log( "image logo error", evt.detail );
+      } );
+
       // Uncomment the following line if an image component instance is marked as non-editable
       // RisePlayerConfiguration.Helpers.sendStartEvent( imageXX );
 
       // Uncomment if testing directly in browser
-      // [ image01, image02, image03, image04 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
+      [ image01, image02, image03, image04, imageLogo ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
     }
 
     window.addEventListener( "rise-components-ready", configureComponents );
