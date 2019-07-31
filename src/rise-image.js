@@ -28,7 +28,7 @@ class RiseImage extends RiseElement {
       },
       metadata: {
         type: Array,
-        value: []
+        value: null
       },
       width: {
         type: String,
@@ -166,12 +166,23 @@ class RiseImage extends RiseElement {
     return this._filesToRenderList.find( file => file.filePath === filePath );
   }
 
+  _getFilesFromMetadata() {
+    return !this.metadata ? [] : this.metadata.map(( entry ) => {
+      return entry.file;
+    });
+  }
+
+  _hasMetadata() {
+    return !!this.metadata && this.metadata.length > 0;
+  }
+
   _reset() {
     if ( !this._initialStart ) {
+      const filesToLog = !this.metadata ? this.files : this._getFilesFromMetadata();
 
       this._stop();
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: this.files });
+      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: filesToLog });
       this._start();
     }
   }
@@ -400,11 +411,22 @@ class RiseImage extends RiseElement {
   }
 
   _start() {
-    if ( !this._isValidFiles( this.files )) {
-      return this._startEmptyPlayUntilDoneTimer();
-    }
+    if ( !this._hasMetadata()) {
+      if ( !this._isValidFiles( this.files )) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
 
-    this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
+      this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
+    } else {
+      const filesArray = this._getFilesFromMetadata();
+
+      // validate metadata files
+      if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
+
+      this._filesList = this._filterInvalidFileTypes( filesArray );
+    }
 
     if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
       return this._startEmptyPlayUntilDoneTimer();
@@ -438,19 +460,12 @@ class RiseImage extends RiseElement {
     this._transitionIndex = 0;
   }
 
-  _hasMetadata() {
-    // Metadata may not be present if no data updates have been received yet.
-    return this.metadata && this.metadata.length > 0;
-  }
-
   _metadataEntryFor( file ) {
     return this.metadata.find( current => current.file === file );
   }
 
   _previewStatusFor( file ) {
-    const hasMetadata = this._hasMetadata();
-
-    if ( !hasMetadata ) {
+    if ( !this._hasMetadata()) {
       return "current";
     }
 
@@ -460,9 +475,7 @@ class RiseImage extends RiseElement {
   }
 
   _timeCreatedFor( file ) {
-    const hasMetadata = this._hasMetadata();
-
-    if ( !hasMetadata ) {
+    if ( !this._hasMetadata()) {
       return "";
     }
 
@@ -474,7 +487,7 @@ class RiseImage extends RiseElement {
   _handleStartForPreview() {
     this._filesList.forEach( file => this._handleImageStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + file + "?_=" +
+      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
         this._timeCreatedFor( file ),
       status: this._previewStatusFor( file )
     }));
