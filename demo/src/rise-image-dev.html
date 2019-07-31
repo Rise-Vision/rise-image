@@ -115,18 +115,23 @@
     isPreview: function(){return false},
     LocalStorage: {
       watchSingleFile: function(file, callback) {
-        callback({
-          status: "CURRENT",
-          filePath: file,
-          fileUrl: "https://storage.googleapis.com/" + file
-        })
+        RisePlayerConfiguration.watchLogoFileCallback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");
+        setTimeout(function() {
+          callback({
+            status: "CURRENT",
+            filePath: file,
+            fileUrl: "https://storage.googleapis.com/" + file
+          });
+        }, 1);
       }
     },
     Branding: {
       watchLogoFile: function(callback){
         RisePlayerConfiguration.watchLogoFileCallback = callback;
-        // callback("");
-        callback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");
+        // setTimeout(function() {
+        //   // callback("");
+        //   callback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");          
+        // }, 1);
       }
     },
     Logger: {

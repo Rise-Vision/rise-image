@@ -554,6 +554,10 @@ class RiseImage extends RiseElement {
       return;
     }
 
+    if ( this._filesList && this._filesList.indexOf( message.filePath ) === -1 ) {
+      return;
+    }
+
     if ( message.status.toUpperCase() === "FILE-ERROR" ) {
       this._handleSingleFileError( message );
       return;
