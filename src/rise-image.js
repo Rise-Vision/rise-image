@@ -233,15 +233,6 @@ class RiseImage extends RiseElement {
     });
   }
 
-  _convertFilesStringToArray( files ) {
-    // single file
-    if ( files.indexOf( "|" ) === -1 ) {
-      return [ files ];
-    }
-
-    return files.split( "|" );
-  }
-
   _isValidFiles( files ) {
     if ( !files || typeof files !== "string" ) {
       return false;
