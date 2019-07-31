@@ -427,8 +427,6 @@ class RiseImage extends RiseElement {
         return entry.file;
       });
 
-      console.log( "metadata files array", filesArray );
-
       // validate metadata files
       if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
         return this._startEmptyPlayUntilDoneTimer();
