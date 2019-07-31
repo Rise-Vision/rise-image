@@ -28,7 +28,7 @@ class RiseImage extends RiseElement {
       },
       metadata: {
         type: Array,
-        value: []
+        value: null
       },
       width: {
         type: String,
@@ -166,12 +166,19 @@ class RiseImage extends RiseElement {
     return this._filesToRenderList.find( file => file.filePath === filePath );
   }
 
+  _getFilesFromMetadata() {
+    return !this.metadata ? [] : this.metadata.map(( entry ) => {
+      return entry.file;
+    });
+  }
+
+  _hasMetadata() {
+    return !!this.metadata && this.metadata.length > 0;
+  }
+
   _reset() {
     if ( !this._initialStart ) {
-      const hasMetadata = this.metadata && this.metadata.length > 0;
-      const filesToLog = !hasMetadata ? this.files : this.metadata.map(( entry ) => {
-        return entry.file;
-      });
+      const filesToLog = !this.metadata ? this.files : this._getFilesFromMetadata();
 
       this._stop();
 
@@ -404,19 +411,14 @@ class RiseImage extends RiseElement {
   }
 
   _start() {
-    // Metadata may not be present if no data updates have been received yet.
-    const hasMetadata = this.metadata && this.metadata.length > 0;
-
-    if ( !hasMetadata ) {
+    if ( !this._hasMetadata()) {
       if ( !this._isValidFiles( this.files )) {
         return this._startEmptyPlayUntilDoneTimer();
       }
 
       this._filesList = this._filterInvalidFileTypes( this.files.split( "|" ));
     } else {
-      const filesArray = this.metadata.map(( entry ) => {
-        return entry.file;
-      });
+      const filesArray = this._getFilesFromMetadata();
 
       // validate metadata files
       if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
@@ -459,10 +461,7 @@ class RiseImage extends RiseElement {
   }
 
   _previewStatusFor( file ) {
-    // Metadata may not be present if no data updates have been received yet.
-    const hasMetadata = this.metadata && this.metadata.length > 0;
-
-    if ( !hasMetadata ) {
+    if ( !this._hasMetadata()) {
       return "current";
     }
 

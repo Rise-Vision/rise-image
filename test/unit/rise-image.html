@@ -147,6 +147,45 @@
 
         });
 
+        suite( "_getFilesFromMetadata", () => {
+          test( "should handle null metadata value", () => {
+            assert.deepEqual( element._getFilesFromMetadata(), []);
+          } );
+
+          test( "should return correct list of files", () => {
+            element.metadata = [
+              { file: "test1.jpg", "thumbnail-url": "http://test1.jpg", exists: true },
+              { file: "test2.jpg", "thumbnail-url": "http://test2.jpg", exists: true },
+              { file: "test3.jpg", "thumbnail-url": "http://test3.jpg", exists: true }
+            ]
+            assert.deepEqual( element._getFilesFromMetadata(), [
+              "test1.jpg", "test2.jpg", "test3.jpg"
+            ]);
+          } );
+
+          test( "should handle empty metadata value", () => {
+            element.metadata = [];
+            assert.deepEqual( element._getFilesFromMetadata(), []);
+          } );
+        } );
+
+        suite( "_hasMetadata", () => {
+          test( "should return correct value", () => {
+            // null value
+            assert.isFalse( element._hasMetadata());
+
+            element.metadata = [];
+            assert.isFalse( element._hasMetadata() );
+
+            element.metadata = [
+              { file: "test1.jpg", "thumbnail-url": "http://test1.jpg", exists: true },
+              { file: "test2.jpg", "thumbnail-url": "http://test2.jpg", exists: true },
+              { file: "test3.jpg", "thumbnail-url": "http://test3.jpg", exists: true }
+            ];
+            assert.isTrue( element._hasMetadata() );
+          } );
+        } );
+
         suite( "_filterInvalidFileTypes", () => {
           test( "should return filtered files list", () => {
             assert.deepEqual( element._filterInvalidFileTypes( [ "test1.jpg", "test2.gif", "test3.txt", "test4.png", "test5.webm" ] ), [
