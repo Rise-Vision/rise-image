@@ -185,6 +185,7 @@ class RiseImage extends RiseElement {
       }
     } else {
       this._logoHandler && this._logoHandler();
+      this._logoHandler = null;
 
       this._setLogoFile( "" );
     }
