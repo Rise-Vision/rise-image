@@ -182,10 +182,10 @@
         RisePlayerConfiguration.isPreview = () => false;
       });
 
-      test('it should render image', () => {
+      test('it should render image with a cache bumper parameter', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png");
+        assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=");
       });
 
     });
