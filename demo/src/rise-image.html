@@ -18,9 +18,9 @@
       import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
       import "@polymer/iron-image/iron-image.js";
     </script>
-    <script src="https://widgets.risevision.com/staging/common/2019.07.30.16.50/config-test.js"></script>
-    <script src="https://widgets.risevision.com/staging/common/2019.07.30.16.50/common-template.js"></script>
-    <script src="https://widgets.risevision.com/staging/components/rise-image/2019.07.30.15.05/rise-image.js"></script>
+    <script src="https://widgets.risevision.com/staging/common/2019.08.02.15.38/config-test.js"></script>
+    <script src="https://widgets.risevision.com/staging/common/2019.08.02.15.38/common-template.js"></script>
+    <script src="https://widgets.risevision.com/staging/components/rise-image/2019.07.31.19.29/rise-image.js"></script>
     <script>
       if (document.domain.indexOf("localhost") === -1) {
         try {
@@ -67,6 +67,17 @@
       #image04Wrapper > rise-image {
         background-color: cornflowerblue;
       }
+
+      #imageLogoWrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+      }
+
+      #imageLogoWrapper > rise-image {
+        background-color: coral;
+      }
+
     </style>
   </head>
   <body>
@@ -76,7 +87,7 @@
       id="rise-image-01"
       label="My Image"
       responsive
-      files="risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Costa Rican Frog.jpg">
+      files="risemedialibrary-e1be58ad-da49-4a50-86b9-9baf2cabd261/Screen Shot 2019-05-31 at 3.44.00 PM.png">
     </rise-image>
   </div>
 
@@ -116,8 +127,8 @@
     </rise-image>
   </div>
 
-  <p>Logo</p>
-  <div id="image01Wrapper">
+  <p class="branding-color-secondary">Logo</p>
+  <div id="imageLogoWrapper" class="branding-color-primary-bg">
     <rise-image
       id="rise-image-logo"
       label="My Image"
