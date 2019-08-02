@@ -147,6 +147,45 @@
 
         });
 
+        suite( "_getFilesFromMetadata", () => {
+          test( "should handle null metadata value", () => {
+            assert.deepEqual( element._getFilesFromMetadata(), []);
+          } );
+
+          test( "should return correct list of files", () => {
+            element.metadata = [
+              { file: "test1.jpg", "thumbnail-url": "http://test1.jpg", exists: true },
+              { file: "test2.jpg", "thumbnail-url": "http://test2.jpg", exists: true },
+              { file: "test3.jpg", "thumbnail-url": "http://test3.jpg", exists: true }
+            ]
+            assert.deepEqual( element._getFilesFromMetadata(), [
+              "test1.jpg", "test2.jpg", "test3.jpg"
+            ]);
+          } );
+
+          test( "should handle empty metadata value", () => {
+            element.metadata = [];
+            assert.deepEqual( element._getFilesFromMetadata(), []);
+          } );
+        } );
+
+        suite( "_hasMetadata", () => {
+          test( "should return correct value", () => {
+            // null value
+            assert.isFalse( element._hasMetadata());
+
+            element.metadata = [];
+            assert.isFalse( element._hasMetadata() );
+
+            element.metadata = [
+              { file: "test1.jpg", "thumbnail-url": "http://test1.jpg", exists: true },
+              { file: "test2.jpg", "thumbnail-url": "http://test2.jpg", exists: true },
+              { file: "test3.jpg", "thumbnail-url": "http://test3.jpg", exists: true }
+            ];
+            assert.isTrue( element._hasMetadata() );
+          } );
+        } );
+
         suite( "_filterInvalidFileTypes", () => {
           test( "should return filtered files list", () => {
             assert.deepEqual( element._filterInvalidFileTypes( [ "test1.jpg", "test2.gif", "test3.txt", "test4.png", "test5.webm" ] ), [
@@ -246,6 +285,8 @@
           });
 
           teardown( () => {
+            element.metadata = null;
+
             element._handleImageStatusUpdated.restore();
           } );
 
@@ -255,7 +296,7 @@
 
             assert.isTrue( element._handleImageStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=",
               status: "current"
             } ));
           } );
@@ -266,22 +307,38 @@
 
             assert.deepEqual( element._handleImageStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest1.png?_=",
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest2.png?_=",
               status: "current"
             } );
 
             assert.deepEqual( element._handleImageStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest3.png?_=",
               status: "current"
             } );
           } );
+
+          test( "should call _handleImageStatusUpdated with correct data and time created", () => {
+            const file = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png";
+            element._filesList = [ file ];
+            element.metadata = [
+              { file, exists: true, "time-created": 123 }
+            ];
+            element._handleStartForPreview();
+
+            assert.isTrue( element._handleImageStatusUpdated.calledWith({
+              filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=123",
+              status: "current"
+            } ));
+          } );
+
         } );
 
        suite( "uptime", () => {
@@ -336,7 +393,7 @@
 
         });
 
-        suite( "Play Unitl Done", () => {
+        suite( "Play Until Done", () => {
 
           suite( "_isDone()", () => {
 

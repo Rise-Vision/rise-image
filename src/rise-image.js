@@ -28,7 +28,7 @@ class RiseImage extends RiseElement {
       },
       metadata: {
         type: Array,
-        value: []
+        value: null
       },
       width: {
         type: String,
@@ -191,12 +191,23 @@ class RiseImage extends RiseElement {
     }
   }
 
+  _getFilesFromMetadata() {
+    return !this.metadata ? [] : this.metadata.map(( entry ) => {
+      return entry.file;
+    });
+  }
+
+  _hasMetadata() {
+    return !!this.metadata && this.metadata.length > 0;
+  }
+
   _reset() {
     if ( !this._initialStart ) {
+      const filesToLog = !this.metadata ? this.files : this._getFilesFromMetadata();
 
       this._stop();
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: this.files, isLogo: this.isLogo, logoFile: this.logoFile });
+      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: filesToLog, isLogo: this.isLogo, logoFile: this.logoFile });
       this._start();
     }
   }
@@ -427,11 +438,22 @@ class RiseImage extends RiseElement {
   _start() {
     var files = this.logoFile || this.files;
 
-    if ( !this._isValidFiles( files )) {
-      return this._startEmptyPlayUntilDoneTimer();
-    }
+    if ( this.logoFile || !this._hasMetadata()) {
+      if ( !this._isValidFiles( files )) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
 
-    this._filesList = this._filterInvalidFileTypes( files.split( "|" ));
+      this._filesList = this._filterInvalidFileTypes( files.split( "|" ));
+    } else {
+      const filesArray = this._getFilesFromMetadata();
+
+      // validate metadata files
+      if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
+
+      this._filesList = this._filterInvalidFileTypes( filesArray );
+    }
 
     if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
       return this._startEmptyPlayUntilDoneTimer();
@@ -465,23 +487,35 @@ class RiseImage extends RiseElement {
     this._transitionIndex = 0;
   }
 
-  _previewStatusFor( file ) {
-    // Metadata may not be present if no data updates have been received yet.
-    const hasMetadata = this.metadata && this.metadata.length > 0;
+  _metadataEntryFor( file ) {
+    return this.metadata.find( current => current.file === file );
+  }
 
-    if ( !hasMetadata ) {
+  _previewStatusFor( file ) {
+    if ( !this._hasMetadata()) {
       return "current";
     }
 
-    const entry = this.metadata.find( current => current.file === file );
+    const entry = this._metadataEntryFor( file );
 
     return entry && entry.exists ? "current" : "deleted";
+  }
+
+  _timeCreatedFor( file ) {
+    if ( !this._hasMetadata()) {
+      return "";
+    }
+
+    const entry = this._metadataEntryFor( file );
+
+    return entry && entry[ "time-created" ] ? entry[ "time-created" ] : "";
   }
 
   _handleStartForPreview() {
     this._filesList.forEach( file => this._handleImageStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + file,
+      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
+        this._timeCreatedFor( file ),
       status: this._previewStatusFor( file )
     }));
   }
