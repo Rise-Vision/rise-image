@@ -17,7 +17,13 @@
 
       RisePlayerConfiguration = {
         isConfigured: () => true,
-        isPreview: () => false
+        isPreview: () => false,
+        Branding: {
+          watchLogoFile: () => {}
+        },
+        LocalStorage: {
+          watchSingleFile: () => {}
+        }
       };
     </script>
     <script src="../../src/rise-image.js" type="module"></script>
@@ -478,6 +484,165 @@
 
           });
 
+        });
+
+        suite( "branding", () => {
+          suite( "element.isLogo", () => {
+            test( "should default to isLogo = false", () => {
+              assert.equal( element.isLogo, false );
+            });
+
+            test( "should call _isLogoChanged when isLogo is changed", () => {
+              sinon.stub(element, "_isLogoChanged");
+              
+              element.isLogo = true;
+
+              assert.isTrue( element._isLogoChanged.called );
+            });
+
+          });
+
+          suite( "element.logoFile", () => {
+            test( "should be readonly property", () => {
+              assert.equal( element.logoFile, "" );
+
+              element.logoFile = "testFile.jpg";
+
+              assert.equal( element.logoFile, "" );
+            });
+
+            test( "should update via setter", () => {
+              assert.equal( element.logoFile, "" );
+
+              element._setLogoFile( "testFile.jpg" );
+
+              assert.equal( element.logoFile, "testFile.jpg" );
+            });
+
+          });
+
+          suite( "_isLogoChanged", () => {
+            var unregisterSpy;
+
+            setup( () => {
+              unregisterSpy = sinon.spy();
+
+              sinon.stub( RisePlayerConfiguration.Branding, "watchLogoFile" ).returns( unregisterSpy );
+            });
+
+            teardown( () => {
+              RisePlayerConfiguration.Branding.watchLogoFile.restore();
+            });
+
+            test( "should attach logoFile watcher", () => {
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledWith( sinon.match.func ));
+            });
+
+            test( "should attach logoFile watcher, once", () => {
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledWith( sinon.match.func ));
+
+              element._isLogoChanged();
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
+            });
+
+            test( "should set logoFile when watcher is called", () => {
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledWith( sinon.match.func ));
+
+              RisePlayerConfiguration.Branding.watchLogoFile.getCall(0).args[0]("sampleLogo.jpg");
+
+              assert.equal( element.logoFile, "sampleLogo.jpg");
+            });
+
+            test( "should detach logoFile watcher", () => {
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
+
+              element.isLogo = false;
+              
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
+              assert.isTrue( unregisterSpy.calledOnce );
+            });
+
+            test( "should detach logoFile watcher once", () => {
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
+
+              element.isLogo = false;
+              
+              assert.isTrue( unregisterSpy.calledOnce );
+
+              element._isLogoChanged();
+
+              assert.isTrue( unregisterSpy.calledOnce );
+            });
+
+            test( "should reset logoFile", () => {
+              element.logoFile = "someFile.jpg";
+              element.isLogo = true;
+
+              assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
+
+              element.isLogo = false;
+
+              assert.equal( element.logoFile, "");
+            });
+
+          });
+
+          suite( "_start", () => {
+            setup( () => {
+              element.metadata = [{
+                "file": "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/apache.png",
+                "exists": true
+              }, {
+                "file": "risemedialibrary-abc123/README.md",
+                "exists": true
+              }];              
+            });
+
+            test( "should set _filesList to logoFile if it exists", () => {
+              assert.isOk( element.files );
+              assert.isOk( element.metadata );
+
+              element._setLogoFile("risemedialibrary-abc123/testFile.jpg");
+
+              element._start();
+
+              assert.deepEqual( element._filesList, [ "risemedialibrary-abc123/testFile.jpg" ]);
+            });
+
+            test( "should set _filesList to metadata if logoFile is balnk", () => {
+              assert.isOk( element.files );
+              assert.isOk( element.metadata );
+
+              element._setLogoFile("");
+
+              element._start();
+
+              assert.deepEqual( element._filesList, [ "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/apache.png" ]);
+            });
+
+            test( "should set _filesList to files if logoFile and metadata are blank", () => {
+              assert.isOk( element.files );
+
+              element.metadata = "";
+              element._setLogoFile("");
+
+              element._start();
+
+              assert.deepEqual( element._filesList, [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" ]);
+            });
+
+          });
         });
 
         suite( "_previewStatusFor", () => {

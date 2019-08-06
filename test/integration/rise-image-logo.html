@@ -1,0 +1,199 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="../../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+  <script src="../../node_modules/mocha/mocha.js"></script>
+  <script src="../../node_modules/chai/chai.js"></script>
+  <script src="../../node_modules/sinon/pkg/sinon.js"></script>
+  <script src="../../node_modules/wct-mocha/wct-mocha.js"></script>
+  <script>
+    const LOGO_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png';
+    const LOGO_URL = `https://storage.googleapis.com/${ LOGO_PATH }`;
+    const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/somefile.png';
+    const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
+
+    RisePlayerConfiguration = {
+      isConfigured: () => true,
+      isPreview: () => false,
+      Branding: {
+        watchLogoFile: (handler) => {
+          handler("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png");
+        }
+      }
+    };
+  </script>
+  <script src="../../src/rise-image.js" type="module"></script>
+</head>
+<body>
+<test-fixture id="test-block">
+  <template>
+    <rise-image
+      width="300"
+      height="240"
+      sizing="contain"
+      position="top"
+      is-logo="true"
+      files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/somefile.png">
+    </rise-image>
+  </template>
+</test-fixture>
+
+<script>
+  suite( "rise-image logo", () => {
+    let element;
+
+    setup(() => {
+      RisePlayerConfiguration.Logger = {
+        info: () => {},
+        warning: () => {},
+        error: () => {}
+      };
+
+      element = fixture("test-block");
+    });
+
+    teardown(() => {
+      RisePlayerConfiguration.Logger = {};
+    });
+
+    suite('render image', () => {
+      setup(() => {
+        RisePlayerConfiguration.LocalStorage = {
+          watchSingleFile: (file, handler) => {
+            handler({ status: "CURRENT", filePath: file, fileUrl: `https://storage.googleapis.com/${ file }` });
+          }
+        };
+      });
+
+      teardown(() => {
+        RisePlayerConfiguration.LocalStorage = {};
+      });
+
+      test('it should render logo when an image is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+      });
+
+      test('it should fallback to show default files when logoUrl is blank', () => {
+        element._setLogoFile("");
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, SAMPLE_URL);
+      });
+
+      test('it should not render image when file type is invalid', () => {
+        let spy = sinon.spy( element, "_renderImage" );
+
+        element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.isFalse(spy.called);
+        assert.equal(element.$.image.src, "");
+
+        spy.restore();
+      });
+
+    });
+
+    suite('error', () => {
+      setup(() => {
+        RisePlayerConfiguration.LocalStorage = {
+          watchSingleFile: (file, handler) => {
+            handler({
+              filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
+              fileUrl: null,
+              status: "FILE-ERROR",
+              errorMessage: "image download error",
+              errorDetail: "network failure"
+            });
+          }
+        };
+      });
+
+      test('it should send an image error event if an image local storage error was received', (done) => {
+        element.addEventListener('image-error', event => {
+          assert.deepEqual( event.detail, {
+            filePath: LOGO_PATH,
+            errorMessage: "image download error",
+            errorDetail: "network failure"
+          });
+
+          done();
+        });
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+      });
+
+      test('it should send an image error event when the single file type is invalid', done => {
+        element.addEventListener('image-error', event => {
+          assert.deepEqual( event.detail, {
+            files: [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt" ],
+            errorMessage: "All file formats are invalid"
+          });
+
+          done();
+        });
+
+        element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+      });
+
+      test("should send an image error event when failed to render an SVG file", done => {
+        const svgFilePath = "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg",
+          svgFileUrl = `https://storage.googleapis.com/${svgFilePath}`;
+
+        sinon.stub(element, "_getDataUrlFromSVGLocalUrl").callsFake(() => {
+          return Promise.reject("Request failed: 404: Not found");
+        });
+
+        element.addEventListener('image-error', event => {
+          assert.deepEqual( event.detail, {
+            filePath: svgFilePath,
+            errorMessage: "Request failed: 404: Not found"
+          });
+
+          done();
+        });
+
+        RisePlayerConfiguration.LocalStorage = {
+          watchSingleFile: ( file, handler ) => {
+            handler({ status: "CURRENT", filePath: svgFilePath, fileUrl: svgFileUrl  });
+          }
+        };
+
+        element._setLogoFile( svgFilePath );
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+      })
+    });
+
+    suite('running on preview or directly in browser', () => {
+      setup(() => {
+        RisePlayerConfiguration.isPreview = () => true;
+      });
+
+      teardown(() => {
+        RisePlayerConfiguration.isPreview = () => false;
+      });
+
+      test('it should render image with a cache bumper parameter', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=");
+      });
+
+    });
+  });
+
+</script>
+</body>
+</html>
