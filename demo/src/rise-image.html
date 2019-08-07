@@ -18,9 +18,9 @@
       import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
       import "@polymer/iron-image/iron-image.js";
     </script>
-    <script src="https://widgets.risevision.com/staging/common/2019.08.02.15.38/config-test.js"></script>
-    <script src="https://widgets.risevision.com/staging/common/2019.08.02.15.38/common-template.js"></script>
-    <script src="https://widgets.risevision.com/staging/components/rise-image/2019.08.02.18.49/rise-image.js"></script>
+    <script src="https://widgets.risevision.com/beta/common/config-test.min.js"></script>
+    <script src="https://widgets.risevision.com/beta/common/common-template.min.js"></script>
+    <script src="https://widgets.risevision.com/beta/components/rise-image/1/rise-image.js"></script>
     <script>
       if (document.domain.indexOf("localhost") === -1) {
         try {
@@ -87,7 +87,7 @@
       id="rise-image-01"
       label="My Image"
       responsive
-      files="risemedialibrary-e1be58ad-da49-4a50-86b9-9baf2cabd261/Screen Shot 2019-05-31 at 3.44.00 PM.png">
+      files="7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/Costa Rican Frog.jpg">
     </rise-image>
   </div>
 
@@ -162,10 +162,6 @@
         console.log( "image 4 error", evt.detail );
       } );
 
-      image04.addEventListener( "image-error", ( evt ) => {
-        console.log( "image 4 error", evt.detail );
-      } );
-
       imageLogo.addEventListener( "image-error", ( evt ) => {
         console.log( "image logo error", evt.detail );
       } );
@@ -174,7 +170,7 @@
       // RisePlayerConfiguration.Helpers.sendStartEvent( imageXX );
 
       // Uncomment if testing directly in browser
-      [ image01, image02, image03, image04, imageLogo ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
+      // [ image01, image02, image03, image04, imageLogo ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
     }
 
     window.addEventListener( "rise-components-ready", configureComponents );

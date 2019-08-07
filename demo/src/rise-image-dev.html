@@ -45,6 +45,16 @@
       #image04Wrapper > rise-image {
         background-color: cornflowerblue;
       }
+
+      #imageLogoWrapper {
+        width: 350px;
+        height: 350px;
+        position: relative;
+      }
+
+      #imageLogoWrapper > rise-image {
+        background-color: coral;
+      }
     </style>
   </head>
   <body>
@@ -98,7 +108,7 @@
   </div>
 
   <p>Logo</p>
-  <div id="image01Wrapper">
+  <div id="imageLogoWrapper">
     <rise-image
       id="rise-image-logo"
       label="My Image"
@@ -115,23 +125,18 @@
     isPreview: function(){return false},
     LocalStorage: {
       watchSingleFile: function(file, callback) {
-        RisePlayerConfiguration.watchLogoFileCallback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");
-        setTimeout(function() {
-          callback({
-            status: "CURRENT",
-            filePath: file,
-            fileUrl: "https://storage.googleapis.com/" + file
-          });
-        }, 1);
+        callback({
+          status: "CURRENT",
+          filePath: file,
+          fileUrl: "https://storage.googleapis.com/" + file
+        });
       }
     },
     Branding: {
       watchLogoFile: function(callback){
         RisePlayerConfiguration.watchLogoFileCallback = callback;
-        // setTimeout(function() {
-        //   // callback("");
-        //   callback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");          
-        // }, 1);
+
+        callback("risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/kcu_logo.png");
       }
     },
     Logger: {
@@ -171,9 +176,6 @@
   configureComponents('#rise-image-03');
   configureComponents('#rise-image-04');
   configureComponents('#rise-image-logo');
-
-  // Uncomment if testing directly in browser
-  // [ image01, image02, image03, image04 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
 
   setTimeout(function() {
     window.dispatchEvent( new Event('rise-components-ready') );
