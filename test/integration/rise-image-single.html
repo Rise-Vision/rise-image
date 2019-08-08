@@ -77,15 +77,7 @@
         assert.equal(element.$.image.src, SAMPLE_URL);
       });
 
-      test('it should update rendered logo when a new version is available', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
-        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
-
-        assert.equal(element.$.image.src, SAMPLE_URL + "?cachebuster=234");
-      });
-
-      test('it should update rendered logo when a new version is available', () => {
+      test('it should update rendered image when a new version is available', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
         watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
