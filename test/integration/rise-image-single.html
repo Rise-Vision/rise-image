@@ -14,6 +14,8 @@
   <script>
     const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png';
     const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
+    const SAMPLE_PATH2 = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png';
+    const SAMPLE_URL2 = `https://storage.googleapis.com/${ SAMPLE_PATH2 }`;
 
     RisePlayerConfiguration = {
       isConfigured: () => true,
@@ -54,10 +56,13 @@
     });
 
     suite('render image', () => {
+      let watchHandler;
       setup(() => {
         RisePlayerConfiguration.LocalStorage = {
           watchSingleFile: (file, handler) => {
-            handler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL });
+            watchHandler = handler;
+
+            handler({ status: "CURRENT", filePath: file, fileUrl: `https://storage.googleapis.com/${ file }` });
           }
         };
       });
@@ -70,6 +75,46 @@
         element.dispatchEvent( new CustomEvent( "start" ) );
 
         assert.equal(element.$.image.src, SAMPLE_URL);
+      });
+
+      test('it should update rendered logo when a new version is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, SAMPLE_URL + "?cachebuster=234");
+      });
+
+      test('it should update rendered logo when a new version is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, SAMPLE_URL + "?cachebuster=234");
+      });
+
+      test('it should update files', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, SAMPLE_URL);
+
+        element.files = SAMPLE_PATH2;
+
+        assert.equal(element.$.image.src, SAMPLE_URL2);
+      });
+
+      test('it should not update files that were removed', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, SAMPLE_URL);
+
+        element.files = SAMPLE_PATH2;
+
+        assert.equal(element.$.image.src, SAMPLE_URL2);
+
+        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, SAMPLE_URL2);
       });
 
       test('it should not render image when file attribute is empty', () => {

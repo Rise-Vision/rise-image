@@ -17,11 +17,14 @@
     const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/somefile.png';
     const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
 
+    let brandingHandler;
     RisePlayerConfiguration = {
       isConfigured: () => true,
       isPreview: () => false,
       Branding: {
         watchLogoFile: (handler) => {
+          brandingHandler = handler;
+
           handler("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png");
         }
       }
@@ -62,9 +65,12 @@
     });
 
     suite('render image', () => {
+      let watchHandler;
       setup(() => {
         RisePlayerConfiguration.LocalStorage = {
           watchSingleFile: (file, handler) => {
+            watchHandler = handler;
+
             handler({ status: "CURRENT", filePath: file, fileUrl: `https://storage.googleapis.com/${ file }` });
           }
         };
@@ -80,12 +86,50 @@
         assert.equal(element.$.image.src, LOGO_URL);
       });
 
+      test('it should update rendered logo when a new version is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        watchHandler({ status: "CURRENT", filePath: LOGO_PATH, fileUrl: `https://storage.googleapis.com/${ LOGO_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, LOGO_URL + "?cachebuster=234");
+      });
+
       test('it should fallback to show default files when logoUrl is blank', () => {
         element._setLogoFile("");
 
         element.dispatchEvent( new CustomEvent( "start" ) );
 
         assert.equal(element.$.image.src, SAMPLE_URL);
+      });
+
+      test('it should update logo', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+
+        brandingHandler(SAMPLE_PATH);
+
+        assert.equal(element.$.image.src, SAMPLE_URL);
+      });
+
+      test('it should not do anything if files field is updated', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+
+        element.files = SAMPLE_PATH + "updated";
+
+        assert.equal(element.$.image.src, LOGO_URL);
+      });
+
+      test('it should not do anything if original file is updated', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+
+        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, LOGO_URL);
       });
 
       test('it should not render image when file type is invalid', () => {
