@@ -12,14 +12,22 @@
   <script src="../../node_modules/sinon/pkg/sinon.js"></script>
   <script src="../../node_modules/wct-mocha/wct-mocha.js"></script>
   <script>
-    const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png';
+    const LOGO_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png';
+    const LOGO_URL = `https://storage.googleapis.com/${ LOGO_PATH }`;
+    const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/somefile.png';
     const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
-    const SAMPLE_PATH2 = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png';
-    const SAMPLE_URL2 = `https://storage.googleapis.com/${ SAMPLE_PATH2 }`;
 
+    let brandingHandler;
     RisePlayerConfiguration = {
       isConfigured: () => true,
-      isPreview: () => false
+      isPreview: () => false,
+      Branding: {
+        watchLogoFile: (handler) => {
+          brandingHandler = handler;
+
+          handler("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png");
+        }
+      }
     };
   </script>
   <script src="../../src/rise-image.js" type="module"></script>
@@ -32,13 +40,14 @@
       height="240"
       sizing="contain"
       position="top"
-      files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png">
+      is-logo="true"
+      files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/somefile.png">
     </rise-image>
   </template>
 </test-fixture>
 
 <script>
-  suite( "rise-image single file", () => {
+  suite( "rise-image logo", () => {
     let element;
 
     setup(() => {
@@ -71,61 +80,62 @@
         RisePlayerConfiguration.LocalStorage = {};
       });
 
-      test('it should render image when an image is available', () => {
+      test('it should render logo when an image is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+      });
+
+      test('it should update rendered logo when a new version is available', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        watchHandler({ status: "CURRENT", filePath: LOGO_PATH, fileUrl: `https://storage.googleapis.com/${ LOGO_PATH }?cachebuster=234` });
+
+        assert.equal(element.$.image.src, LOGO_URL + "?cachebuster=234");
+      });
+
+      test('it should fallback to show default files when logoUrl is blank', () => {
+        element._setLogoFile("");
+
         element.dispatchEvent( new CustomEvent( "start" ) );
 
         assert.equal(element.$.image.src, SAMPLE_URL);
       });
 
-      test('it should update rendered image when a new version is available', () => {
+      test('it should update logo', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+
+        brandingHandler(SAMPLE_PATH);
+
+        assert.equal(element.$.image.src, SAMPLE_URL);
+      });
+
+      test('it should not do anything if files field is updated', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
+
+        element.files = SAMPLE_PATH + "updated";
+
+        assert.equal(element.$.image.src, LOGO_URL);
+      });
+
+      test('it should not do anything if original file is updated', () => {
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal(element.$.image.src, LOGO_URL);
 
         watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
 
-        assert.equal(element.$.image.src, SAMPLE_URL + "?cachebuster=234");
-      });
-
-      test('it should update files', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
-        assert.equal(element.$.image.src, SAMPLE_URL);
-
-        element.files = SAMPLE_PATH2;
-
-        assert.equal(element.$.image.src, SAMPLE_URL2);
-      });
-
-      test('it should not update files that were removed', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
-        assert.equal(element.$.image.src, SAMPLE_URL);
-
-        element.files = SAMPLE_PATH2;
-
-        assert.equal(element.$.image.src, SAMPLE_URL2);
-
-        watchHandler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: `https://storage.googleapis.com/${ SAMPLE_PATH }?cachebuster=234` });
-
-        assert.equal(element.$.image.src, SAMPLE_URL2);
-      });
-
-      test('it should not render image when file attribute is empty', () => {
-        let spy = sinon.spy( element, "_renderImage" );
-
-        element.files = "";
-
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
-        assert.isFalse(spy.called);
-        assert.equal(element.$.image.src, "");
-
-        spy.restore();
+        assert.equal(element.$.image.src, LOGO_URL);
       });
 
       test('it should not render image when file type is invalid', () => {
         let spy = sinon.spy( element, "_renderImage" );
 
-        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
+        element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
 
         element.dispatchEvent( new CustomEvent( "start" ) );
 
@@ -155,7 +165,7 @@
       test('it should send an image error event if an image local storage error was received', (done) => {
         element.addEventListener('image-error', event => {
           assert.deepEqual( event.detail, {
-            filePath: SAMPLE_PATH,
+            filePath: LOGO_PATH,
             errorMessage: "image download error",
             errorDetail: "network failure"
           });
@@ -176,7 +186,7 @@
           done();
         });
 
-        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
+        element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
 
         element.dispatchEvent( new CustomEvent( "start" ) );
       });
@@ -204,7 +214,7 @@
           }
         };
 
-        element.files = svgFilePath;
+        element._setLogoFile( svgFilePath );
 
         element.dispatchEvent( new CustomEvent( "start" ) );
       })
