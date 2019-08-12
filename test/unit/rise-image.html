@@ -449,6 +449,17 @@
               assert.isTrue( element._sendDoneEvent.calledWith(true) );
             });
 
+             test("should keep transitioning the images when it is done", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesToRenderList = [{ filePath: "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/DSC01624.JPG"}, { filePath: "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/DSC01625.JPG"}];
+
+              element._onShowImageComplete();
+
+              assert.equal( element._transitionIndex, 1);
+            });
+
           });
 
           suite( "_startEmptyPlayUntilDoneTimer()", () => {

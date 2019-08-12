@@ -337,7 +337,7 @@ class RiseImage extends RiseElement {
 
   _onShowImageComplete() {
     if ( this._isDone()) {
-      return super._sendDoneEvent( true );
+      super._sendDoneEvent( true );
     }
 
     if ( this._transitionIndex < ( this._filesToRenderList.length - 1 )) {
