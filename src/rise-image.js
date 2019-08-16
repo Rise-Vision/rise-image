@@ -540,7 +540,9 @@ class RiseImage extends RiseElement {
   _handleSingleFileError( message ) {
     const { filePath, fileUrl } = message,
       details = { filePath, errorMessage: message.errorMessage, errorDetail: message.errorDetail },
-      fileInError = this._getManagedFileInError( filePath );
+      fileInError = this._getManagedFileInError( filePath ),
+      errorName = ( "NOEXIST" === message.status.toUpperCase() && !message.errorMessage ) ? "file-not-found" :
+        ( message.errorMessage === "Insufficient disk space" ? "file-insufficient-disk-space-error" : "image-rls-error" );
 
     // prevent repetitive logging when component instance is receiving messages from other potential component instances watching same file
     // Note: to avoid using Lodash or Underscore library for just a .isEqual() function, taking a simple approach to object comparison with JSON.stringify()
@@ -564,7 +566,7 @@ class RiseImage extends RiseElement {
       "Invalid response with status code [CODE]"
      */
 
-    this._log( RiseImage.LOG_TYPE_ERROR, "image-rls-error", {
+    this._log( RiseImage.LOG_TYPE_ERROR, errorName, {
       errorMessage: message.errorMessage,
       errorDetail: message.errorDetail
     }, { storage: this._getStorageData( filePath, fileUrl ) });
@@ -581,6 +583,17 @@ class RiseImage extends RiseElement {
         this._clearDisplayedImage();
       }
     }
+
+    //if all requested files have errors, then trigger PUD
+    if ( this._filesList ) {
+      let allFilesHaveErrors = this._filesList.every( filePath => {
+        return this._getManagedFileInError( filePath );
+      });
+
+      if ( allFilesHaveErrors ) {
+        this._startEmptyPlayUntilDoneTimer();
+      }
+    }
   }
 
   _handleSingleFileUpdate( message ) {
@@ -592,7 +605,7 @@ class RiseImage extends RiseElement {
       return;
     }
 
-    if ( message.status.toUpperCase() === "FILE-ERROR" ) {
+    if ( message.status.toUpperCase() === "FILE-ERROR" || message.status.toUpperCase() === "NOEXIST" ) {
       this._handleSingleFileError( message );
       return;
     }

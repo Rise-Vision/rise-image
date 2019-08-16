@@ -106,6 +106,54 @@
         } );
     });
 
+    test( "should log an 'file-insufficient-disk-space-error' event when FILE-ERROR is received", () => {
+      RisePlayerConfiguration.LocalStorage.watchSingleFile = ( file, handler ) => {
+          handler({
+              filePath: SAMPLE_PATH,
+              fileUrl: null,
+              status: "FILE-ERROR",
+              errorMessage: "Insufficient disk space",
+              errorDetail: "network failure"
+          });
+      };
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
+
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
+        assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-insufficient-disk-space-error");
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {
+            errorMessage: "Insufficient disk space",
+            errorDetail: "network failure"
+        });
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            storage: storageData
+        } );
+    });
+
+    test( "should log an 'file-not-found' event when NOEXIST is received", () => {
+      RisePlayerConfiguration.LocalStorage.watchSingleFile = ( file, handler ) => {
+          handler({
+              filePath: SAMPLE_PATH,
+              fileUrl: null,
+              status: "NOEXIST",
+              errorMessage: undefined,
+              errorDetail: undefined
+          });
+      };
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
+
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
+        assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-not-found");
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            storage: storageData
+        } );
+    });
+
     test( "should log an 'image-format-invalid' event when file type is invalid", () => {
         element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
 
