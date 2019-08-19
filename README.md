@@ -65,6 +65,7 @@ The resulting GCS path is: risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f
 - **responsive**: ( boolean / non-value attribute ): Applies responsive sizing to the image(s) which will respond to instance parent `<div>` container. When _responsive_ is used, the component will ignore any "width", "height", "sizing", or "position" attribute values
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the template editor.
 - **play-until-done**: ( empty / optional ): If present, it indicates this component will send the `"report-done"` event when if finishes showing the images.
+- **is-logo**: ( boolean / optional ): If ``"true"``, it indicates this component will display the Company Logo defined in the Branding settings.
 
 
 ### Events
