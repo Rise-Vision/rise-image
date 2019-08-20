@@ -586,7 +586,7 @@ class RiseImage extends RiseElement {
 
     //if all requested files have errors, then trigger PUD
     if ( this._filesList ) {
-      let allFilesHaveErrors = this._filesList.every( filePath => {
+      const allFilesHaveErrors = this._filesList.every( filePath => {
         return this._getManagedFileInError( filePath );
       });
 
