@@ -13,6 +13,7 @@
     <script src="../../node_modules/wct-mocha/wct-mocha.js"></script>
     <script>
       const SAMPLE_PATH = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png';
+      const SAMPLE_PATH2 = 'risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443014/logo.png';
       const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
 
       RisePlayerConfiguration = {
@@ -467,6 +468,7 @@
 
             setup( () => {
               sandbox.stub(element, '_startEmptyPlayUntilDoneTimer');
+              sandbox.stub(element, '_log');
             });
 
             teardown( () => {
@@ -489,6 +491,40 @@
               element.files = "risemedialibrary-abc123/README.md";
 
               element._start();
+
+              assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
+            });
+
+            test("should start empty play until done timer if file list includes single file and it does not exist", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesList = [ SAMPLE_PATH ];
+
+              element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
+
+              assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
+            });
+
+            test("should start empty play until done timer if file list includes 2 files and both do not exist", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesList = [ SAMPLE_PATH,  SAMPLE_PATH2];
+
+              element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
+              element._handleSingleFileError({filePath: SAMPLE_PATH2, status: "NOEXIST"});
+
+              assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
+            });
+
+            test("should start empty play until done timer if file list includes 2 images with the same path and file do not exist", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesList = [ SAMPLE_PATH,  SAMPLE_PATH];
+
+              element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
 
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
