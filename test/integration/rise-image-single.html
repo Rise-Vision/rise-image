@@ -152,33 +152,16 @@
         };
       });
 
-      test('it should send an image error event if an image local storage error was received', (done) => {
-        element.addEventListener('image-error', event => {
-          assert.deepEqual( event.detail, {
-            filePath: SAMPLE_PATH,
-            errorMessage: "image download error",
-            errorDetail: "network failure"
-          });
-
-          done();
-        });
+      test('it should send a file error event if an image local storage error was received', () => {
+        sinon.spy( element, "watchedFileErrorCallback" );
 
         element.dispatchEvent( new CustomEvent( "start" ) );
-      });
 
-      test('it should send an image error event when the single file type is invalid', done => {
-        element.addEventListener('image-error', event => {
-          assert.deepEqual( event.detail, {
-            files: [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt" ],
-            errorMessage: "All file formats are invalid"
-          });
-
-          done();
+        assert.deepEqual( element.watchedFileErrorCallback.lastCall.args[0], {
+          filePath: SAMPLE_PATH,
+          errorMessage: "image download error",
+          errorDetail: "network failure"
         });
-
-        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
-
-        element.dispatchEvent( new CustomEvent( "start" ) );
       });
 
       test("should send an image error event when failed to render an SVG file", done => {

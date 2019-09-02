@@ -109,9 +109,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
   constructor() {
     super();
-
     this._setVersion( version );
 
+    this._validFiles = [];
+    this._filesToRenderList = [];
     this._initialStart = true;
     this._transitionIndex = 0;
     this._transitionTimer = null;
@@ -315,7 +316,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _configureShowingImages() {
-    this._filesToRenderList = this._managedFiles
+    this._filesToRenderList = this.managedFiles
       .slice( 0 )
       .filter( f => this._validFiles.includes( f.filePath ));
 
@@ -338,7 +339,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
     this.stopWatch();
 
-    if ( this._hasMetadata()) {
+    if ( !this.logoFile && this._hasMetadata()) {
       filesList = this._getFilesFromMetadata();
     } else {
       filesList = files.split( "|" )
@@ -349,10 +350,15 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     const { validFiles } = this.validateFiles( filesList, VALID_FILE_TYPES );
 
     if ( !validFiles || !validFiles.length ) {
+      this._validFiles = [];
+
       return this._startEmptyPlayUntilDoneTimer();
     } else {
+      this._validFiles = validFiles;
+      this.startWatch( validFiles );
+
       if ( RisePlayerConfiguration.isPreview()) {
-        return this._handleStartForPreview();
+        this._handleStartForPreview();
       }
     }
   }
@@ -394,7 +400,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _handleStartForPreview() {
-    this._filesList.forEach( file => this._handleImageStatusUpdated({
+    this._validFiles.forEach( file => this.handleFileStatusUpdated({
       filePath: file,
       fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
         this._timeCreatedFor( file ),

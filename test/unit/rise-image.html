@@ -56,29 +56,6 @@
           element = fixture("test-block");
         });
 
-        suite( "_isValidFiles", () => {
-          test( "should return true if 'files' attribute is a non-empty String", () => {
-            assert.isTrue( element._isValidFiles( "test" ) );
-          } );
-
-          test( "should return false if 'files' attribute is not a String or empty String", () => {
-            assert.isFalse( element._isValidFiles( 123 ) );
-            assert.isFalse( element._isValidFiles( ["test1|test2"] ) );
-            assert.isFalse( element._isValidFiles( "" ) );
-          } );
-
-          test( "should return true if 'files' attribute is a String containing values separated by '|'", () => {
-            assert.isTrue( element._isValidFiles( "test1|test2|test3" ) );
-          } );
-
-          test( "should return false if 'files' attribute contains '|' with any empty value", () => {
-            assert.isFalse(element._isValidFiles("test|"));
-            assert.isFalse(element._isValidFiles("|test"));
-            assert.isFalse(element._isValidFiles("|"));
-            assert.isFalse(element._isValidFiles("test1|test2||test3"));
-          } );
-        } );
-
         suite( "_getStorageFileFormat", () => {
           test( "should return correct format from file path", () => {
             assert.equal( element._getStorageFileFormat( SAMPLE_PATH ), "png" );
@@ -193,18 +170,6 @@
           } );
         } );
 
-        suite( "_filterInvalidFileTypes", () => {
-          test( "should return filtered files list", () => {
-            assert.deepEqual( element._filterInvalidFileTypes( [ "test1.jpg", "test2.gif", "test3.txt", "test4.png", "test5.webm" ] ), [
-              "test1.jpg", "test2.gif", "test4.png"
-            ] )
-          } );
-
-          test( "should return empty list", () => {
-            assert.deepEqual( element._filterInvalidFileTypes( [ "test1.webm", "test2.text", "test3.mov" ] ), [] );
-          } );
-        } );
-
         suite( "_reset", () => {
           setup( () => {
             sinon.stub( element, "_start" );
@@ -219,17 +184,17 @@
 
             element._initialStart = false;
             element._watchInitiated = true;
-            element._filesList = [ SAMPLE_PATH ];
-            element._managedFiles = [ { filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL, order: 0 } ];
+            element._validFiles = [ SAMPLE_PATH ];
+            element.managedFiles = [ { filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL, order: 0 } ];
             element._filesToRenderList = [ { filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL, order: 0 } ];
-            element._managedFilesInError= [ { filePath: "test path", fileUrl: "test url", order: 1 } ];
+            element._managedFilesInError = [ { filePath: "test path", fileUrl: "test url", order: 1 } ];
             element._transitionTimer = 12345;
             element._transitionIndex = 3;
             element._reset();
 
             assert.isFalse( element._watchInitiated );
-            assert.isEmpty( element._filesList );
-            assert.isEmpty( element._managedFiles );
+            assert.isEmpty( element._validFiles );
+            assert.isEmpty( element.managedFiles );
             assert.isEmpty( element._managedFilesInError );
             assert.isEmpty( element._filesToRenderList );
             assert.isNull( element._transitionTimer );
@@ -288,58 +253,58 @@
 
         suite( "_handleStartForPreview", () => {
           setup( () => {
-            sinon.stub(element, "_handleImageStatusUpdated");
+            sinon.stub(element, "handleFileStatusUpdated");
           });
 
           teardown( () => {
             element.metadata = null;
 
-            element._handleImageStatusUpdated.restore();
+            element.handleFileStatusUpdated.restore();
           } );
 
-          test( "should call _handleImageStatusUpdated with correct data", () => {
-            element._filesList = [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" ];
+          test( "should call handleFileStatusUpdated with correct data", () => {
+            element._validFiles = [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" ];
             element._handleStartForPreview();
 
-            assert.isTrue( element._handleImageStatusUpdated.calledWith({
+            assert.isTrue( element.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=",
               status: "current"
             } ));
           } );
 
-          test( "should call _handleImageStatusUpdated for each file", () => {
-            element._filesList = [ "risemedialibrary-abc123/test1.png", "risemedialibrary-abc123/test2.png", "risemedialibrary-abc123/test3.png" ];
+          test( "should call handleFileStatusUpdated for each file", () => {
+            element._validFiles = [ "risemedialibrary-abc123/test1.png", "risemedialibrary-abc123/test2.png", "risemedialibrary-abc123/test3.png" ];
             element._handleStartForPreview();
 
-            assert.deepEqual( element._handleImageStatusUpdated.args[0][0], {
+            assert.deepEqual( element.handleFileStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest1.png?_=",
               status: "current"
             } );
 
-            assert.deepEqual( element._handleImageStatusUpdated.args[1][0], {
+            assert.deepEqual( element.handleFileStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest2.png?_=",
               status: "current"
             } );
 
-            assert.deepEqual( element._handleImageStatusUpdated.args[2][0], {
+            assert.deepEqual( element.handleFileStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest3.png?_=",
               status: "current"
             } );
           } );
 
-          test( "should call _handleImageStatusUpdated with correct data and time created", () => {
+          test( "should call handleFileStatusUpdated with correct data and time created", () => {
             const file = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png";
-            element._filesList = [ file ];
+            element._validFiles = [ file ];
             element.metadata = [
               { file, exists: true, "time-created": 123 }
             ];
             element._handleStartForPreview();
 
-            assert.isTrue( element._handleImageStatusUpdated.calledWith({
+            assert.isTrue( element.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=123",
               status: "current"
@@ -499,7 +464,7 @@
               element.setAttribute( "play-until-done", true);
 
               element._transitionIndex = 0;
-              element._filesList = [ SAMPLE_PATH ];
+              element._validFiles = [ SAMPLE_PATH ];
 
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
 
@@ -510,7 +475,7 @@
               element.setAttribute( "play-until-done", true);
 
               element._transitionIndex = 0;
-              element._filesList = [ SAMPLE_PATH,  SAMPLE_PATH2];
+              element._validFiles = [ SAMPLE_PATH,  SAMPLE_PATH2];
 
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
               element._handleSingleFileError({filePath: SAMPLE_PATH2, status: "NOEXIST"});
@@ -522,7 +487,7 @@
               element.setAttribute( "play-until-done", true);
 
               element._transitionIndex = 0;
-              element._filesList = [ SAMPLE_PATH,  SAMPLE_PATH];
+              element._validFiles = [ SAMPLE_PATH,  SAMPLE_PATH];
 
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
 
@@ -541,7 +506,7 @@
 
             test( "should call _isLogoChanged when isLogo is changed", () => {
               sinon.stub(element, "_isLogoChanged");
-              
+
               element.isLogo = true;
 
               assert.isTrue( element._isLogoChanged.called );
@@ -613,7 +578,7 @@
               assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
 
               element.isLogo = false;
-              
+
               assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
               assert.isTrue( unregisterSpy.calledOnce );
             });
@@ -624,7 +589,7 @@
               assert.isTrue( RisePlayerConfiguration.Branding.watchLogoFile.calledOnce );
 
               element.isLogo = false;
-              
+
               assert.isTrue( unregisterSpy.calledOnce );
 
               element._isLogoChanged();
@@ -653,10 +618,10 @@
               }, {
                 "file": "risemedialibrary-abc123/README.md",
                 "exists": true
-              }];              
+              }];
             });
 
-            test( "should set _filesList to logoFile if it exists", () => {
+            test( "should set _validFiles to logoFile if it exists", () => {
               assert.isOk( element.files );
               assert.isOk( element.metadata );
 
@@ -664,10 +629,10 @@
 
               element._start();
 
-              assert.deepEqual( element._filesList, [ "risemedialibrary-abc123/testFile.jpg" ]);
+              assert.deepEqual( element._validFiles, [ "risemedialibrary-abc123/testFile.jpg" ]);
             });
 
-            test( "should set _filesList to metadata if logoFile is balnk", () => {
+            test( "should set _validFiles to metadata if logoFile is blank", () => {
               assert.isOk( element.files );
               assert.isOk( element.metadata );
 
@@ -675,10 +640,10 @@
 
               element._start();
 
-              assert.deepEqual( element._filesList, [ "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/apache.png" ]);
+              assert.deepEqual( element._validFiles, [ "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/apache.png" ]);
             });
 
-            test( "should set _filesList to files if logoFile and metadata are blank", () => {
+            test( "should set _validFiles to files if logoFile and metadata are blank", () => {
               assert.isOk( element.files );
 
               element.metadata = "";
@@ -686,7 +651,7 @@
 
               element._start();
 
-              assert.deepEqual( element._filesList, [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" ]);
+              assert.deepEqual( element._validFiles, [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png" ]);
             });
 
           });
