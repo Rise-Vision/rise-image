@@ -93,9 +93,7 @@ The component may log the following:
 - **_image-reset_** ( info ): The component observed changes to either _files_ or _duration_ attributes and performs a complete reset to use latest values.
 - **_image-svg-usage_** ( info ): Provides an SVG file _blob size_ and _data url length_ info for investigative purposes.
 - **_image-load-fail_** ( error ): When attempting to render an available image, the image load failed.
-- **_image-format-invalid_** ( error ): A GCS path was set that targets a file with an invalid image file format. Valid image file formats are: jpg, jpeg, png, bmp, svg, gif, and webp.
 - **_image-svg-fail_** ( error ): When component is targeting an SVG file, the component converts the local file URL to a data url to support running on Electron Player. This error event indicates the attempt to get data url or render the SVG file failed.
-- **_image-rls-error_** ( error ): An error is received from Rise Local Storage for a file
 
 In every case of an error, examine event-details entry and the other event fields for more information about the problem.
 

@@ -162,33 +162,29 @@
         };
       });
 
-      test('it should send an image error event if an image local storage error was received', (done) => {
-        element.addEventListener('image-error', event => {
-          assert.deepEqual( event.detail, {
+      test('it should call watchedFileErrorCallback if an image local storage error was received', () => {
+        sinon.spy( element, "watchedFileErrorCallback" );
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.deepEqual( element.watchedFileErrorCallback.lastCall.args[0], {
             filePath: LOGO_PATH,
             errorMessage: "image download error",
             errorDetail: "network failure"
           });
-
-          done();
-        });
-
-        element.dispatchEvent( new CustomEvent( "start" ) );
       });
 
-      test('it should send an image error event when the single file type is invalid', done => {
-        element.addEventListener('image-error', event => {
-          assert.deepEqual( event.detail, {
-            files: [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt" ],
-            errorMessage: "All file formats are invalid"
-          });
-
-          done();
-        });
+      test('it should send an error event when all file types are invalid', () => {
+        sinon.spy( RisePlayerConfiguration.Logger, "error" );
 
         element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
-
         element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.equal( RisePlayerConfiguration.Logger.error.lastCall.args[1], "all-formats-invalid" );
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.lastCall.args[3], {
+          files: [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt" ],
+          errorMessage: "All file formats are invalid"
+        });
       });
 
       test("should send an image error event when failed to render an SVG file", done => {
