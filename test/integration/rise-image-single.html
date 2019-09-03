@@ -164,6 +164,15 @@
         });
       });
 
+      test('it should not call startWatch when the single file type is invalid', () => {
+        sinon.spy( element.__proto__.__proto__, "startWatch" );
+
+        element.files = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt";
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.strictEqual( element.__proto__.__proto__.startWatch.callCount, 0 );
+      });
+
       test("should send an image error event when failed to render an SVG file", done => {
         const svgFilePath = "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg",
           svgFileUrl = `https://storage.googleapis.com/${svgFilePath}`;

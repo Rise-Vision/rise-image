@@ -174,7 +174,7 @@
           });
       });
 
-      test('it should send an error event when all file types are invalid', () => {
+      test('it should send an error event when the logo file type is invalid', () => {
         sinon.spy( RisePlayerConfiguration.Logger, "error" );
 
         element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
