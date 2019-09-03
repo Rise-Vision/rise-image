@@ -56,6 +56,26 @@
           element = fixture("test-block");
         });
 
+        suite( "_isValidFiles", () => {
+          test( "should return true if 'files' attribute is a non-empty String", () => {
+            assert.isTrue( element._isValidFiles( "test" ) );
+          } );
+           test( "should return false if 'files' attribute is not a String or empty String", () => {
+            assert.isFalse( element._isValidFiles( 123 ) );
+            assert.isFalse( element._isValidFiles( ["test1|test2"] ) );
+            assert.isFalse( element._isValidFiles( "" ) );
+          } );
+           test( "should return true if 'files' attribute is a String containing values separated by '|'", () => {
+            assert.isTrue( element._isValidFiles( "test1|test2|test3" ) );
+          } );
+           test( "should return false if 'files' attribute contains '|' with any empty value", () => {
+            assert.isFalse(element._isValidFiles("test|"));
+            assert.isFalse(element._isValidFiles("|test"));
+            assert.isFalse(element._isValidFiles("|"));
+            assert.isFalse(element._isValidFiles("test1|test2||test3"));
+          } );
+        } );
+
         suite( "_getStorageFileFormat", () => {
           test( "should return correct format from file path", () => {
             assert.equal( element._getStorageFileFormat( SAMPLE_PATH ), "png" );

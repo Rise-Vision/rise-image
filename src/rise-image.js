@@ -204,6 +204,19 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     }
   }
 
+  _isValidFiles( files ) {
+    if ( !files || typeof files !== "string" ) {
+      return false;
+    }
+
+    // single symbol
+    if ( files.indexOf( "|" ) === -1 ) {
+      return true;
+    }
+
+    return files.split( "|" ).indexOf( "" ) === -1;
+  }
+
   _getDataUrlFromSVGLocalUrl( file, localUrl ) {
     return new Promise(( resolve, reject ) => {
       const xhr = new XMLHttpRequest();
@@ -342,9 +355,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     if ( !this.logoFile && this._hasMetadata()) {
       filesList = this._getFilesFromMetadata();
     } else {
-      filesList = files.split( "|" )
-        .map( f => f.trim())
-        .filter( f => f.length > 0 );
+      if ( this._isValidFiles( files )) {
+        filesList = files.split( "|" )
+          .map( f => f.trim())
+          .filter( f => f.length > 0 );
+      } else {
+        filesList = [];
+      }
     }
 
     const { validFiles } = this.validateFiles( filesList, VALID_FILE_TYPES );
@@ -426,6 +443,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   watchedFileErrorCallback() {
+    super._setUptimeError( true );
+
     if ( !this._filesToRenderList.length ) {
       this._done();
       this._startEmptyPlayUntilDoneTimer();
