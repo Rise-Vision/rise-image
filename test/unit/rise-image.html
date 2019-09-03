@@ -56,23 +56,23 @@
           element = fixture("test-block");
         });
 
-        suite( "_isValidFiles", () => {
+        suite( "_isValidFilesString", () => {
           test( "should return true if 'files' attribute is a non-empty String", () => {
-            assert.isTrue( element._isValidFiles( "test" ) );
+            assert.isTrue( element._isValidFilesString( "test" ) );
           } );
            test( "should return false if 'files' attribute is not a String or empty String", () => {
-            assert.isFalse( element._isValidFiles( 123 ) );
-            assert.isFalse( element._isValidFiles( ["test1|test2"] ) );
-            assert.isFalse( element._isValidFiles( "" ) );
+            assert.isFalse( element._isValidFilesString( 123 ) );
+            assert.isFalse( element._isValidFilesString( ["test1|test2"] ) );
+            assert.isFalse( element._isValidFilesString( "" ) );
           } );
            test( "should return true if 'files' attribute is a String containing values separated by '|'", () => {
-            assert.isTrue( element._isValidFiles( "test1|test2|test3" ) );
+            assert.isTrue( element._isValidFilesString( "test1|test2|test3" ) );
           } );
            test( "should return false if 'files' attribute contains '|' with any empty value", () => {
-            assert.isFalse(element._isValidFiles("test|"));
-            assert.isFalse(element._isValidFiles("|test"));
-            assert.isFalse(element._isValidFiles("|"));
-            assert.isFalse(element._isValidFiles("test1|test2||test3"));
+            assert.isFalse(element._isValidFilesString("test|"));
+            assert.isFalse(element._isValidFilesString("|test"));
+            assert.isFalse(element._isValidFilesString("|"));
+            assert.isFalse(element._isValidFilesString("test1|test2||test3"));
           } );
         } );
 
@@ -273,7 +273,7 @@
 
         suite( "_handleStartForPreview", () => {
           setup( () => {
-            sinon.stub(element, "handleFileStatusUpdated");
+            sinon.stub(element.__proto__.__proto__, "handleFileStatusUpdated");
           });
 
           teardown( () => {
@@ -297,19 +297,19 @@
             element._validFiles = [ "risemedialibrary-abc123/test1.png", "risemedialibrary-abc123/test2.png", "risemedialibrary-abc123/test3.png" ];
             element._handleStartForPreview();
 
-            assert.deepEqual( element.handleFileStatusUpdated.args[0][0], {
+            assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest1.png?_=",
               status: "current"
             } );
 
-            assert.deepEqual( element.handleFileStatusUpdated.args[1][0], {
+            assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest2.png?_=",
               status: "current"
             } );
 
-            assert.deepEqual( element.handleFileStatusUpdated.args[2][0], {
+            assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123%2Ftest3.png?_=",
               status: "current"
@@ -324,7 +324,7 @@
             ];
             element._handleStartForPreview();
 
-            assert.isTrue( element.handleFileStatusUpdated.calledWith({
+            assert.isTrue( element.__proto__.__proto__.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013%2Flogo.png?_=123",
               status: "current"

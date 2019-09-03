@@ -204,7 +204,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     }
   }
 
-  _isValidFiles( files ) {
+  _isValidFilesString( files ) {
     if ( !files || typeof files !== "string" ) {
       return false;
     }
@@ -350,12 +350,12 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     const files = this.logoFile || this.files;
     let filesList;
 
-    this.stopWatch();
+    super.stopWatch();
 
     if ( !this.logoFile && this._hasMetadata()) {
       filesList = this._getFilesFromMetadata();
     } else {
-      if ( this._isValidFiles( files )) {
+      if ( this._isValidFilesString( files )) {
         filesList = files.split( "|" )
           .map( f => f.trim())
           .filter( f => f.length > 0 );
@@ -364,7 +364,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       }
     }
 
-    const { validFiles } = this.validateFiles( filesList, VALID_FILE_TYPES );
+    const { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
 
     if ( !validFiles || !validFiles.length ) {
       this._validFiles = [];
@@ -372,7 +372,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       return this._startEmptyPlayUntilDoneTimer();
     } else {
       this._validFiles = validFiles;
-      this.startWatch( validFiles );
+      super.startWatch( validFiles );
 
       if ( RisePlayerConfiguration.isPreview()) {
         this._handleStartForPreview();
@@ -384,7 +384,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._validFiles = [];
     this._filesToRenderList = [];
 
-    this.stopWatch();
+    super.stopWatch();
     this._clearDisplayedImage();
 
     timeOut.cancel( this._transitionTimer );
@@ -417,7 +417,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _handleStartForPreview() {
-    this._validFiles.forEach( file => this.handleFileStatusUpdated({
+    this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
       fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
         this._timeCreatedFor( file ),
