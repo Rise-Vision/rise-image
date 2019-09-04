@@ -96,11 +96,11 @@ The component may log the following:
 
 Additionally, because the component inherits from [WatchFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/watch-files-mixin.js) and [ValidFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/valid-files-mixin.js) in [rise-common-component](https://github.com/Rise-Vision/rise-common-component), it may log the following:
 
-- **_file-not-found_** (error): A watched file is not found
-- **_file-insufficient-disk-space-error_** (error): A watched file can not be downloaded due to a lack of disk space
-- **_file-rls-error_** (error): A general RLS error is encountered for a watched file
-- **_format-invalid_** (error): A file with an invalid extension is encountered
-- **_all-formats-invalid_** (error): All files have invalid formats
+- **_file-not-found_** (error): A watched file is not found.
+- **_file-insufficient-disk-space-error_** (error): A watched file can not be downloaded due to a lack of disk space.
+- **_file-rls-error_** (error): A general RLS error is encountered for a watched file.
+- **_format-invalid_** (error): A file with an invalid extension is encountered.
+- **_all-formats-invalid_** (error): All files have invalid formats.
 
 In every case of an error, examine event-details entry and the other event fields for more information about the problem.
 
