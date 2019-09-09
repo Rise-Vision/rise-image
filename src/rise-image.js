@@ -3,10 +3,14 @@
 import { RiseElement } from "rise-common-component/src/rise-element.js";
 import { html } from "@polymer/polymer/lib/utils/html-tag.js";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+import { WatchFilesMixin } from "rise-common-component/src/watch-files-mixin";
+import { ValidFilesMixin } from "rise-common-component/src/valid-files-mixin";
 import { version } from "./rise-image-version.js";
 import "@polymer/iron-image/iron-image.js";
 
-class RiseImage extends RiseElement {
+export const VALID_FILE_TYPES = [ "jpg", "jpeg", "png", "bmp", "svg", "gif", "webp" ];
+
+class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   static get template() {
     return html`
       <style>
@@ -105,15 +109,11 @@ class RiseImage extends RiseElement {
 
   constructor() {
     super();
-
     this._setVersion( version );
 
-    this._watchInitiated = false;
-    this._initialStart = true;
-    this._filesList = [];
-    this._managedFiles = [];
-    this._managedFilesInError = [];
+    this._validFiles = [];
     this._filesToRenderList = [];
+    this._initialStart = true;
     this._transitionIndex = 0;
     this._transitionTimer = null;
   }
@@ -164,14 +164,6 @@ class RiseImage extends RiseElement {
     return filePath.substr( filePath.lastIndexOf( "." ) + 1 ).toLowerCase();
   }
 
-  _getManagedFileInError( filePath ) {
-    return this._managedFilesInError.find( file => file.filePath === filePath );
-  }
-
-  _getManagedFile( filePath ) {
-    return this._managedFiles.find( file => file.filePath === filePath );
-  }
-
   _getFileToRender( filePath ) {
     return this._filesToRenderList.find( file => file.filePath === filePath );
   }
@@ -212,18 +204,17 @@ class RiseImage extends RiseElement {
     }
   }
 
-  _isValidFileType( path ) {
-    const format = this._getStorageFileFormat( path ),
-      valid = [ "jpg", "jpeg", "png", "bmp", "svg", "gif", "webp" ];
-
-
-    for ( let i = 0, len = valid.length; i < len; i++ ) {
-      if ( format.indexOf( valid[ i ]) !== -1 ) {
-        return true;
-      }
+  _isValidFilesString( files ) {
+    if ( !files || typeof files !== "string" ) {
+      return false;
     }
 
-    return false;
+    // single symbol
+    if ( files.indexOf( "|" ) === -1 ) {
+      return true;
+    }
+
+    return files.split( "|" ).indexOf( "" ) === -1;
   }
 
   _getDataUrlFromSVGLocalUrl( file, localUrl ) {
@@ -265,42 +256,6 @@ class RiseImage extends RiseElement {
     });
   }
 
-  _isValidFiles( files ) {
-    if ( !files || typeof files !== "string" ) {
-      return false;
-    }
-
-    // single symbol
-    if ( files.indexOf( "|" ) === -1 ) {
-      return true;
-    }
-
-    return files.split( "|" ).indexOf( "" ) === -1;
-  }
-
-  _filterInvalidFileTypes( files ) {
-    let invalidFiles = [];
-    const filteredFiles = files.filter( file => {
-      const valid = this._isValidFileType( file );
-
-      if ( !valid ) {
-        invalidFiles.push( file );
-      }
-
-      return valid;
-    });
-
-    invalidFiles.forEach( invalidFile => {
-      this._log( RiseImage.LOG_TYPE_ERROR, "image-format-invalid", null, { storage: this._getStorageData( invalidFile ) });
-    });
-
-    if ( !filteredFiles || filteredFiles.length === 0 ) {
-      this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { files, errorMessage: "All file formats are invalid" });
-    }
-
-    return filteredFiles;
-  }
-
   _renderImage( filePath, fileUrl ) {
     if ( this.responsive ) {
       this.$.image.updateStyles({ "--iron-image-width": "100%", "width": "100%", "height": "auto", "display": "inline-block" });
@@ -335,10 +290,14 @@ class RiseImage extends RiseElement {
     return this._transitionIndex === this._filesToRenderList.length - 1 && this.hasAttribute( "play-until-done" );
   }
 
-  _onShowImageComplete() {
+  _done() {
     if ( this._isDone()) {
       super._sendDoneEvent( true );
     }
+  }
+
+  _onShowImageComplete() {
+    this._done();
 
     if ( this._transitionIndex < ( this._filesToRenderList.length - 1 )) {
       this._transitionIndex += 1;
@@ -370,7 +329,10 @@ class RiseImage extends RiseElement {
   }
 
   _configureShowingImages() {
-    this._filesToRenderList = this._managedFiles.slice( 0 );
+    this._filesToRenderList = this.managedFiles
+      .slice( 0 )
+      .filter( f => this._validFiles.includes( f.filePath ));
+
     this._transitionIndex = 0;
 
     if ( this._filesToRenderList.length > 0 ) {
@@ -384,105 +346,48 @@ class RiseImage extends RiseElement {
     }
   }
 
-  _manageFileInError( details, fixed ) {
-    const { filePath, params } = details;
-
-    if ( !filePath ) {
-      return;
-    }
-
-    let fileInError = this._getManagedFileInError( filePath );
-
-    if ( fixed && fileInError ) {
-      // remove this file from files in error list
-      this._managedFilesInError.splice( this._managedFilesInError.findIndex( file => file.filePath === filePath ), 1 );
-    } else if ( !fixed ) {
-      if ( !fileInError ) {
-        fileInError = { filePath, params };
-        // add this file to list of files in error
-        this._managedFilesInError.push( fileInError );
-      } else {
-        fileInError.params = params;
-      }
-    }
-  }
-
-  _manageFile( message ) {
-    const { filePath, status, fileUrl } = message;
-
-    let managedFile = this._getManagedFile( filePath );
-
-    if ( status.toUpperCase() === "CURRENT" ) {
-      if ( !managedFile ) {
-        // get the order that this file should be in from _filesList
-        const order = this._filesList.findIndex( path => path === filePath );
-
-        managedFile = { filePath, fileUrl, order };
-
-        // add this file to list
-        this._managedFiles.push( managedFile );
-      } else {
-        // file has been updated
-        managedFile.fileUrl = fileUrl;
-      }
-    }
-
-    if ( status.toUpperCase() === "DELETED" && managedFile ) {
-      this._managedFiles.splice( this._managedFiles.findIndex( file => file.filePath === filePath ), 1 );
-    }
-
-    // sort the managed files based on order value
-    this._managedFiles.sort(( a, b ) => a.order - b.order );
-  }
-
   _start() {
-    var files = this.logoFile || this.files;
+    const files = this.logoFile || this.files;
+    let filesList;
 
-    if ( this.logoFile || !this._hasMetadata()) {
-      if ( !this._isValidFiles( files )) {
-        return this._startEmptyPlayUntilDoneTimer();
-      }
+    super.stopWatch();
 
-      this._filesList = this._filterInvalidFileTypes( files.split( "|" ));
+    if ( !this.logoFile && this._hasMetadata()) {
+      filesList = this._getFilesFromMetadata();
     } else {
-      const filesArray = this._getFilesFromMetadata();
-
-      // validate metadata files
-      if ( !filesArray || !filesArray.length || filesArray.length === 0 ) {
-        return this._startEmptyPlayUntilDoneTimer();
+      if ( this._isValidFilesString( files )) {
+        filesList = files.split( "|" )
+          .map( f => f.trim())
+          .filter( f => f.length > 0 );
+      } else {
+        filesList = [];
       }
-
-      this._filesList = this._filterInvalidFileTypes( filesArray );
     }
 
-    if ( !this._filesList || !this._filesList.length || this._filesList.length === 0 ) {
+    const { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
+
+    if ( !validFiles || !validFiles.length ) {
+      this._validFiles = [];
+
       return this._startEmptyPlayUntilDoneTimer();
-    }
+    } else {
+      this._validFiles = validFiles;
+      super.startWatch( validFiles );
 
-    if ( RisePlayerConfiguration.isPreview()) {
-      return this._handleStartForPreview();
-    }
-
-    if ( !this._watchInitiated ) {
-      this._filesList.forEach( file => {
-        RisePlayerConfiguration.LocalStorage.watchSingleFile(
-          file, message => this._handleSingleFileUpdate( message )
-        );
-      });
-
-      this._watchInitiated = true;
+      if ( RisePlayerConfiguration.isPreview()) {
+        this._handleStartForPreview();
+      }
     }
   }
 
   _stop() {
-    timeOut.cancel( this._transitionTimer );
+    this._validFiles = [];
+    this._filesToRenderList = [];
+
+    super.stopWatch();
     this._clearDisplayedImage();
 
-    this._watchInitiated = false;
-    this._filesList = [];
-    this._managedFiles = [];
-    this._managedFilesInError = [];
-    this._filesToRenderList = [];
+    timeOut.cancel( this._transitionTimer );
     this._transitionTimer = null;
     this._transitionIndex = 0;
   }
@@ -512,7 +417,7 @@ class RiseImage extends RiseElement {
   }
 
   _handleStartForPreview() {
-    this._filesList.forEach( file => this._handleImageStatusUpdated({
+    this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
       fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
         this._timeCreatedFor( file ),
@@ -537,98 +442,31 @@ class RiseImage extends RiseElement {
     super.log( type, event, details, additionalFields );
   }
 
-  _handleSingleFileError( message ) {
-    const { filePath, fileUrl } = message,
-      details = { filePath, errorMessage: message.errorMessage, errorDetail: message.errorDetail },
-      fileInError = this._getManagedFileInError( filePath ),
-      errorName = ( "NOEXIST" === message.status.toUpperCase() && !message.errorMessage ) ? "file-not-found" :
-        ( message.errorMessage === "Insufficient disk space" ? "file-insufficient-disk-space-error" : "image-rls-error" );
+  watchedFileErrorCallback() {
+    super._setUptimeError( true );
 
-    // prevent repetitive logging when component instance is receiving messages from other potential component instances watching same file
-    // Note: to avoid using Lodash or Underscore library for just a .isEqual() function, taking a simple approach to object comparison with JSON.stringify()
-    // as the property order will not change and the data is not large for this object
-    if ( fileInError && ( JSON.stringify( details ) === JSON.stringify( fileInError.details ))) {
-      return;
-    }
-
-    this._manageFileInError( details, false );
-
-    /*** Possible error messages from Local Storage ***/
-    /*
-      "File's host server could not be reached"
-
-      "File I/O Error"
-
-      "Could not retrieve signed URL"
-
-      "Insufficient disk space"
-
-      "Invalid response with status code [CODE]"
-     */
-
-    this._log( RiseImage.LOG_TYPE_ERROR, errorName, {
-      errorMessage: message.errorMessage,
-      errorDetail: message.errorDetail
-    }, { storage: this._getStorageData( filePath, fileUrl ) });
-
-    this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, details );
-
-
-    if ( this._getManagedFile( filePath )) {
-      // remove this file from the file list since there was a problem with its new version being provided
-      this._manageFile({ filePath, status: "deleted" });
-
-      if ( this._filesToRenderList.length === 1 && this._getFileToRender( message.filePath )) {
-        this._filesToRenderList = [];
-        this._clearDisplayedImage();
-      }
-    }
-
-    //if all requested files have errors, then trigger PUD
-    if ( this._filesList ) {
-      const allFilesHaveErrors = this._filesList.every( filePath => {
-        return this._getManagedFileInError( filePath );
-      });
-
-      if ( allFilesHaveErrors ) {
-        this._startEmptyPlayUntilDoneTimer();
-      }
+    if ( !this._filesToRenderList.length ) {
+      this._done();
+      this._startEmptyPlayUntilDoneTimer();
     }
   }
 
-  _handleSingleFileUpdate( message ) {
-    if ( !message.status || !message.filePath ) {
-      return;
-    }
-
-    if ( this._filesList && this._filesList.indexOf( message.filePath ) === -1 ) {
-      return;
-    }
-
-    if ( message.status.toUpperCase() === "FILE-ERROR" || message.status.toUpperCase() === "NOEXIST" ) {
-      this._handleSingleFileError( message );
-      return;
-    }
-
-    this._handleImageStatusUpdated( message );
+  watchedFileAddedCallback() {
+    this._configureShowingImages();
   }
 
-  _handleImageStatusUpdated( message ) {
-    const { filePath, status } = message;
 
-    this._manageFile( message );
-    this._manageFileInError( message, true );
+  watchedFileDeletedCallback( details ) {
+    const { filePath } = details;
 
-    if ( this._filesToRenderList.length === 1 && status.toUpperCase() === "DELETED" && this._filesToRenderList.find( file => file.filePath === filePath )) {
+    if ( this._filesToRenderList.length === 1 && this._filePathIsRendered( filePath )) {
       this._filesToRenderList = [];
       this._clearDisplayedImage();
-
-      return;
     }
+  }
 
-    if ( status.toUpperCase() === "CURRENT" ) {
-      this._configureShowingImages();
-    }
+  _filePathIsRendered( filePath ) {
+    return this._filesToRenderList.find( file => file.filePath === filePath );
   }
 
   _sendImageEvent( eventName, detail = {}) {
