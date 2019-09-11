@@ -91,18 +91,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     return "image-svg-usage";
   }
 
-  static get LOG_TYPE_INFO() {
-    return "info";
-  }
-
-  static get LOG_TYPE_WARNING() {
-    return "warning";
-  }
-
-  static get LOG_TYPE_ERROR() {
-    return "error";
-  }
-
   static get STORAGE_PREFIX() {
     return "https://storage.googleapis.com/";
   }
