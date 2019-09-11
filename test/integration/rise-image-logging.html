@@ -132,7 +132,7 @@
         } );
     });
 
-    test( "should log an 'file-not-found' event when NOEXIST is received", () => {
+    test( "should log a 'file-not-found' warning when NOEXIST is received", () => {
       RisePlayerConfiguration.LocalStorage.watchSingleFile = ( file, handler ) => {
           handler({
               filePath: SAMPLE_PATH,
@@ -147,9 +147,9 @@
 
         assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
 
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
-        assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-not-found");
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+        assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 0 ], componentData );
+        assert.equal( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 1 ], "file-not-found");
+        assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 3 ], {
             storage: storageData
         } );
     });
