@@ -424,7 +424,7 @@
 
             setup( () => {
               sandbox.stub(element, '_startEmptyPlayUntilDoneTimer');
-              sandbox.stub(element, '_log');
+              sandbox.stub(element.__proto__.__proto__, 'log');
             });
 
             teardown( () => {
