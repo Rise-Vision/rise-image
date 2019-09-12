@@ -27,6 +27,11 @@
 
           handler("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png");
         }
+      },
+      Logger: {
+        info: () => {},
+        error: () => {},
+        warning: () => {}
       }
     };
   </script>
@@ -51,17 +56,7 @@
     let element;
 
     setup(() => {
-      RisePlayerConfiguration.Logger = {
-        info: () => {},
-        warning: () => {},
-        error: () => {}
-      };
-
       element = fixture("test-block");
-    });
-
-    teardown(() => {
-      RisePlayerConfiguration.Logger = {};
     });
 
     suite('render image', () => {

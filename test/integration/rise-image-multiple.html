@@ -29,7 +29,12 @@
 
     RisePlayerConfiguration = {
       isConfigured: () => true,
-      isPreview: () => false
+      isPreview: () => false,
+      Logger: {
+        info: () => {},
+        error: () => {},
+        warning: () => {}
+      }
     };
   </script>
   <script src="../../src/rise-image.js" type="module"></script>
@@ -51,12 +56,6 @@
       clock;
 
     setup(() => {
-      RisePlayerConfiguration.Logger = {
-        info: () => {},
-        warning: () => {},
-        error: () => {}
-      };
-
       clock = sinon.useFakeTimers();
 
       element = fixture("test-block");
@@ -64,7 +63,6 @@
 
     teardown(() => {
       clock.restore();
-      RisePlayerConfiguration.Logger = {};
     });
 
     suite('transition images', () => {
