@@ -19,7 +19,12 @@
 
     RisePlayerConfiguration = {
       isConfigured: () => true,
-      isPreview: () => false
+      isPreview: () => false,
+      Logger: {
+        info: () => {},
+        error: () => {},
+        warning: () => {}
+      }
     };
   </script>
   <script src="../../src/rise-image.js" type="module"></script>
@@ -42,17 +47,7 @@
     let element;
 
     setup(() => {
-      RisePlayerConfiguration.Logger = {
-        info: () => {},
-        warning: () => {},
-        error: () => {}
-      };
-
       element = fixture("test-block");
-    });
-
-    teardown(() => {
-      RisePlayerConfiguration.Logger = {};
     });
 
     suite('render image', () => {
