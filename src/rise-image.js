@@ -124,7 +124,9 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       const filePath = this._filesToRenderList[ this._transitionIndex ].filePath,
         fileUrl = this._filesToRenderList[ this._transitionIndex ].fileUrl;
 
-      this._log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, { storage: super.getStorageData( filePath, fileUrl ) });
+      super.log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, {
+        storage: super.getStorageData( filePath, fileUrl )
+      });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
     });
 
@@ -170,7 +172,9 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
       this._stop();
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, { files: filesToLog, isLogo: this.isLogo, logoFile: this.logoFile });
+      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, {
+        files: filesToLog, isLogo: this.isLogo, logoFile: this.logoFile
+      });
       this._start();
     }
   }
@@ -206,7 +210,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
             reject( "Read failed" );
           }
 
-          this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, { svg_details: {
+          super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, { svg_details: {
             blob_size: xhr.response.size,
             data_url_length: reader.result.length
           } }, { storage: super.getStorageData( file, localUrl ) });
@@ -244,7 +248,9 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
           this.$.image.src = dataUrl;
         })
         .catch( error => {
-          this._log( RiseImage.LOG_TYPE_ERROR, "image-svg-fail", error, { storage: super.getStorageData( filePath, fileUrl ) });
+          super.log( RiseImage.LOG_TYPE_ERROR, "image-svg-fail", error, {
+            storage: super.getStorageData( filePath, fileUrl )
+          });
           this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: error });
         });
     } else {
@@ -400,17 +406,12 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     if ( this._initialStart ) {
       this._initialStart = false;
 
-      this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, { files: this.files, isLogo: this.isLogo, logoFile: this.logoFile });
+      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, {
+        files: this.files, isLogo: this.isLogo, logoFile: this.logoFile
+      });
 
       this._start();
     }
-  }
-
-  _log( type, event, details = null, additionalFields ) {
-    if ( RisePlayerConfiguration.isPreview()) {
-      return;
-    }
-    super.log( type, event, details, additionalFields );
   }
 
   watchedFileErrorCallback() {
