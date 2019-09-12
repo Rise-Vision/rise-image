@@ -76,35 +76,6 @@
           } );
         } );
 
-        suite( "_getStorageFileFormat", () => {
-          test( "should return correct format from file path", () => {
-            assert.equal( element._getStorageFileFormat( SAMPLE_PATH ), "png" );
-            assert.equal( element._getStorageFileFormat( "risemedialibrary-abc123/logo.jpg" ), "jpg" );
-            assert.equal( element._getStorageFileFormat( "risemedialibrary-abc123/logo.jpg.svg" ), "svg" );
-            assert.equal( element._getStorageFileFormat( "" ), "" );
-          } );
-        } );
-
-        suite( "_getStorageData", () => {
-          test( "should return correct storage data", () => {
-            assert.deepEqual( element._getStorageData( "risemedialibrary-abc123/logo.jpg", "file:///path-to-file" ), {
-              configuration: "storage file",
-              file_form: "jpg",
-              file_path: "risemedialibrary-abc123/logo.jpg",
-              local_url: "file:///path-to-file"
-            } );
-          } );
-
-          test( "should handle empty fileUrl value", () => {
-            assert.deepEqual( element._getStorageData( "risemedialibrary-abc123/logo.jpg" ), {
-              configuration: "storage file",
-              file_form: "jpg",
-              file_path: "risemedialibrary-abc123/logo.jpg",
-              local_url: ""
-            } );
-          } );
-        } );
-
         suite( "_getDataUrlFromSVGLocalUrl", () => {
           let xhr,
             requests;

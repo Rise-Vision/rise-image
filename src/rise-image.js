@@ -124,7 +124,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       const filePath = this._filesToRenderList[ this._transitionIndex ].filePath,
         fileUrl = this._filesToRenderList[ this._transitionIndex ].fileUrl;
 
-      this._log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, { storage: this._getStorageData( filePath, fileUrl ) });
+      this._log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", null, { storage: super.getStorageData( filePath, fileUrl ) });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
     });
 
@@ -133,23 +133,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
         super._setUptimeError( false );
       }
     });
-  }
-
-  _getStorageData( file, url ) {
-    return {
-      configuration: "storage file",
-      file_form: this._getStorageFileFormat( file ),
-      file_path: file,
-      local_url: url || ""
-    }
-  }
-
-  _getStorageFileFormat( filePath ) {
-    if ( !filePath || typeof filePath !== "string" ) {
-      return "";
-    }
-
-    return filePath.substr( filePath.lastIndexOf( "." ) + 1 ).toLowerCase();
   }
 
   _getFileToRender( filePath ) {
@@ -226,7 +209,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
           this._log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, { svg_details: {
             blob_size: xhr.response.size,
             data_url_length: reader.result.length
-          } }, { storage: this._getStorageData( file, localUrl ) });
+          } }, { storage: super.getStorageData( file, localUrl ) });
 
           resolve( reader.result );
         };
@@ -255,13 +238,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this.$.image.position = this.position;
     }
 
-    if ( this._getStorageFileFormat( filePath ) === "svg" ) {
+    if ( super.getStorageFileFormat( filePath ) === "svg" ) {
       this._getDataUrlFromSVGLocalUrl( filePath, fileUrl )
         .then( dataUrl => {
           this.$.image.src = dataUrl;
         })
         .catch( error => {
-          this._log( RiseImage.LOG_TYPE_ERROR, "image-svg-fail", error, { storage: this._getStorageData( filePath, fileUrl ) });
+          this._log( RiseImage.LOG_TYPE_ERROR, "image-svg-fail", error, { storage: super.getStorageData( filePath, fileUrl ) });
           this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: error });
         });
     } else {
