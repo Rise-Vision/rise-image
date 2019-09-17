@@ -115,7 +115,15 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _configureImageEventListeners() {
-    this.$.image.addEventListener( "error-changed", () => {
+    this.$.image.addEventListener( "error-changed", ( event ) => {
+      // This value is the 'error' property of <iron-image> and indicates if the last set src failed to load.
+      const failed = event.detail.value;
+
+      if ( !failed ) {
+        // since it didn't fail, don't execute further
+        return;
+      }
+
       // to prevent test coverage failing
       if ( this._filesToRenderList.length === 0 ) {
         return;
