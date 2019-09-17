@@ -250,7 +250,34 @@
 
             done();
         }, 1000 );
-    })
+    });
+
+    test("should log an 'image-load-fail'", () => {
+        element.dispatchEvent( new CustomEvent( "start" ));
+
+        element.$.image.dispatchEvent( new CustomEvent( "error-changed", { detail: { value: true } } ));
+
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
+        assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "image-load-fail");
+        assert.isNull( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ] );
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            storage: {
+                configuration: "storage file",
+                file_form: "png",
+                file_path: SAMPLE_PATH,
+                local_url: `https://storage.googleapis.com/${SAMPLE_PATH}`
+
+            }
+        } );
+    });
+
+    test("should not log an 'image-load-fail'", () => {
+      element.dispatchEvent( new CustomEvent( "start" ));
+
+      element.$.image.dispatchEvent( new CustomEvent( "error-changed", { detail: { value: false } } ));
+
+      assert.isFalse(RisePlayerConfiguration.Logger.error.called);
+      });
 
   });
 </script>
