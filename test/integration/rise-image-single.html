@@ -60,6 +60,10 @@
             handler({ status: "CURRENT", filePath: file, fileUrl: `https://storage.googleapis.com/${ file }` });
           }
         };
+
+        RisePlayerConfiguration.LocalMessaging = {
+          isConnected: () => { return true; }
+        }
       });
 
       teardown(() => {
@@ -130,6 +134,18 @@
         spy.restore();
       });
 
+      test('it should not watch files when LM is not connected', () => {
+        sinon.spy( element, "startWatch" );
+        sinon.spy( element, "_startEmptyPlayUntilDoneTimer" );
+
+        RisePlayerConfiguration.LocalMessaging.isConnected = () => { return false; };
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.isFalse(element.startWatch.called);
+        assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
+      });
+
     });
 
     suite('error', () => {
@@ -144,6 +160,10 @@
               errorDetail: "network failure"
             });
           }
+        };
+
+        RisePlayerConfiguration.LocalMessaging = {
+          isConnected: () => { return true; }
         };
       });
 

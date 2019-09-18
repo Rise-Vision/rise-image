@@ -610,6 +610,10 @@
                 "file": "risemedialibrary-abc123/README.md",
                 "exists": true
               }];
+
+              RisePlayerConfiguration.LocalMessaging = {
+                isConnected: () => { return true; }
+              }
             });
 
             test( "should set _validFiles to logoFile if it exists", () => {
