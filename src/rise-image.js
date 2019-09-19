@@ -357,11 +357,16 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       return this._startEmptyPlayUntilDoneTimer();
     } else {
       this._validFiles = validFiles;
-      super.startWatch( validFiles );
 
       if ( RisePlayerConfiguration.isPreview()) {
-        this._handleStartForPreview();
+        return this._handleStartForPreview();
       }
+
+      if ( !RisePlayerConfiguration.LocalMessaging.isConnected()) {
+        return this._startEmptyPlayUntilDoneTimer();
+      }
+
+      super.startWatch( validFiles );
     }
   }
 

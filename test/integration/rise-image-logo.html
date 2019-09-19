@@ -34,6 +34,10 @@
         warning: () => {}
       }
     };
+
+    RisePlayerConfiguration.LocalMessaging = {
+      isConnected: () => { return true; }
+    }
   </script>
   <script src="../../src/rise-image.js" type="module"></script>
 </head>
@@ -138,6 +142,20 @@
         assert.equal(element.$.image.src, "");
 
         spy.restore();
+      });
+
+      test('it should not watch logo file when LM is not connected', () => {
+        sinon.spy( element, "startWatch" );
+        sinon.spy( element, "_startEmptyPlayUntilDoneTimer" );
+
+        RisePlayerConfiguration.LocalMessaging.isConnected = () => { return false; };
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
+
+        assert.isFalse(element.startWatch.called);
+        assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
+
+        RisePlayerConfiguration.LocalMessaging.isConnected = () => { return true; };
       });
 
     });
