@@ -31,7 +31,9 @@ jobs:
       - checkout
       - restore_cache:
           key: node-cache-{{ checksum "package.json" }}
+      - run: sudo npm install -g wct-istanbul
       - run: npm test
+      - run: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 
   build:
     docker: *BUILDIMAGE
