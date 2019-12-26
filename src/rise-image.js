@@ -145,10 +145,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     });
   }
 
-  _getFileToRender( filePath ) {
-    return this._filesToRenderList.find( file => file.filePath === filePath );
-  }
-
   _isLogoChanged() {
     if ( this.isLogo ) {
       if ( !this._logoHandler ) {
