@@ -1,4 +1,4 @@
-# Image Web Component [![CircleCI](https://circleci.com/gh/Rise-Vision/rise-image/tree/master.svg?style=svg)](https://circleci.com/gh/Rise-Vision/rise-image/tree/master)
+# Image Web Component [![CircleCI](https://circleci.com/gh/Rise-Vision/rise-image/tree/master.svg?style=svg)](https://circleci.com/gh/Rise-Vision/rise-image/tree/master) [![Coverage Status](https://coveralls.io/repos/github/Rise-Vision/rise-image/badge.svg?branch=master)](https://coveralls.io/github/Rise-Vision/rise-image?branch=master)
 
 ## Introduction
 
@@ -134,6 +134,12 @@ Execute the following command in Terminal to run tests:
 
 ```
 npm run test
+```
+
+In case `polymer-cli` was installed globally, the `wct-istanbul` package will also need to be installed globally:
+
+```
+npm install -g wct-istanbul
 ```
 
 #### Local Server
