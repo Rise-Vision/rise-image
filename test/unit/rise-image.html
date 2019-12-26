@@ -161,6 +161,19 @@
           } );
         } );
 
+        suite( "_filePathIsRendered", () => {
+          test( "should find the file", () => {
+            element._filesToRenderList = [
+              { filePath: "a.png" },
+              { filePath: "b.png" },
+              { filePath: "c.png" }
+            ];
+
+            const image = element._filePathIsRendered( "b.png" );
+            assert.deepEqual(image, { filePath: "b.png" });
+          } );
+        } );
+
         suite( "_reset", () => {
           setup( () => {
             sinon.stub( element, "_start" );
@@ -487,6 +500,28 @@
 
           });
 
+          suite( "_startEmptyPlayUntilDoneTimer function", () => {
+            const sandbox = sinon.createSandbox();
+
+            setup( () => {
+              sandbox.stub(window, 'clearTimeout');
+              sandbox.stub(window, 'setTimeout');
+            });
+
+            teardown( () => {
+              sandbox.restore();
+            });
+
+            test("should start empty play until done timer on empty files list", () => {
+              element.setAttribute( "play-until-done", true );
+
+              element._startEmptyPlayUntilDoneTimer();
+
+              assert.isTrue( window.clearTimeout.called );
+              assert.isTrue( window.setTimeout.called );
+            });
+          });
+
         });
 
         suite( "branding", () => {
@@ -702,8 +737,30 @@
 
         });
 
-      });
+        suite( "watchedFileDeletedCallback", () => {
+           const sandbox = sinon.createSandbox();
 
+           setup( () => {
+             sandbox.stub(element, '_clearDisplayedImage');
+           });
+
+           teardown( () => {
+             sandbox.restore();
+           });
+
+          test( "should clear displayed image if the only image was deleted", () => {
+            element._filesToRenderList = [
+              { filePath: "a.txt" }
+            ];
+
+            element.watchedFileDeletedCallback({ filePath: "a.txt" });
+
+            assert.deepEqual( element._filesToRenderList, [] );
+            assert.equal( element._clearDisplayedImage.callCount, 1 );
+          });
+        });
+
+      });
     </script>
   </body>
 </html>
