@@ -1,5 +1,6 @@
 demo/node_modules/**
 node_modules/**
 build
+coverage
 dist
 wct.conf.js
