@@ -91,10 +91,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     return "image-svg-usage";
   }
 
-  static get STORAGE_PREFIX() {
-    return "https://storage.googleapis.com/";
-  }
-
   constructor() {
     super();
     this._setVersion( version );
