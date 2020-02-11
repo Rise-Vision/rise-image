@@ -18,6 +18,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
           display: inline-block;
           overflow: hidden;
           position: relative;
+          line-height: 0;
         }
       </style>
       <iron-image id="image"></iron-image>
