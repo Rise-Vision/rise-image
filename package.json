@@ -10,6 +10,7 @@
   "author": "Rise Vision",
   "license": "GPL-3.0+",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-image",
     "pretest": "eslint .",
     "test": "polymer test --root ./ --config-file ./node_modules/rise-common-component/wct.conf.js",
@@ -29,5 +30,8 @@
     "mocha": "^5.2.0",
     "sinon": "^7.3.2",
     "wct-mocha": "^1.0.0"
+  },
+  "resolutions": {
+    "braces": "^2.3.1"
   }
 }
