@@ -11,9 +11,10 @@
   "license": "GPL-3.0+",
   "scripts": {
     "preinstall": "npx npm-force-resolutions || true",
+    "prebuild": "eslint .",
     "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-image",
     "pretest": "eslint .",
-    "test": "polymer test --root ./ --config-file ./node_modules/rise-common-component/wct.conf.js",
+    "test": "polymer test",
     "pretty": "eslint . --fix"
   },
   "dependencies": {
@@ -27,8 +28,10 @@
     "eslint-config-idiomatic": "^4.0.0",
     "@polymer/test-fixture": "^4.0.2",
     "chai": "^4.2.0",
+    "coveralls": "3.0.6",
     "mocha": "^5.2.0",
     "sinon": "^7.3.2",
+    "wct-istanbul": "^0.14.3",
     "wct-mocha": "^1.0.0"
   },
   "resolutions": {
