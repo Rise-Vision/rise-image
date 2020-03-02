@@ -30,20 +30,25 @@ There is no need to configure listeners if the component runs as editable ( defa
   </body>
 ```
 
-### Labels
+### Label & Help Text
 
 The component may define a 'label' attribute that defines the text that will appear for this instance in the template editor.
 
-This attribute holds a literal value, for example:
+It may also define a 'help-text' attribute that will be presented as a help message for the users. Ideally, it should be used to provide the recommended image size.
+
+These attributes hold a literal value, for example:
 
 ```
   <rise-image id="rise-image-sample"
     label="Sample"
+    help-text="Recommended image size is 1920x1080 pixels."
     files="risemedialibrary-abc123/logo.png">
   </rise-image>
 ```
 
-If it's not set, the label for the component defaults to "Image", which is applied via the   [generate_blueprint.js](https://github.com/Rise-Vision/html-template-library/blob/master/generate_blueprint.js) file for a HTML Template build/deployment.
+If it's not set, the 'label' for the component defaults to "Image", which is applied via the   [generate_blueprint.js](https://github.com/Rise-Vision/html-template-library/blob/master/generate_blueprint.js) file for a HTML Template build/deployment.
+
+If 'help-text' is not defined, no help message will be displayed for this component instance in the template editor.
 
 ### Attributes
 
