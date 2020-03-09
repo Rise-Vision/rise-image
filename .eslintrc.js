@@ -5,8 +5,7 @@ module.exports = {
     "node": true
   },
   "extends": [
-    "eslint:recommended",
-    "idiomatic"
+    "eslint:recommended"
   ],
   "parserOptions": {
     "sourceType": "module"
