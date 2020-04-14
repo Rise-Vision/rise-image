@@ -380,7 +380,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _previewStatusFor( file ) {
-    if ( !this._hasMetadata()) {
+    if ( this.isLogo || !this._hasMetadata()) {
       return "current";
     }
 

@@ -696,6 +696,18 @@
             assert.equal( status, "current" );
           });
 
+          test( "should ignore metadata and return 'current' status if is logo", () => {
+            element.metadata = [{
+              "file": "risemedialibrary-abc123/logo.png",
+              "exists": false
+            }];
+            element.isLogo = true;
+
+            const status = element._previewStatusFor( 'risemedialibrary-abc123/logo.png' );
+
+            assert.equal( status, "current" );
+          });
+
           test( "should get current status if metadata says that file exists", () => {
             element.metadata = [{
               "file": "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/apache.png",
