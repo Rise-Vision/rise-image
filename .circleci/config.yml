@@ -180,10 +180,14 @@ jobs:
           name: run the test
           working_directory: rise-launcher-electron-e2e
           command: node test-display-runner-using-downloaded-installer.js << parameters.displayId >> 20
-      - run: mkdir output
-      - run: mv ./rise-launcher-electron-e2e/*screenshot.jpg output
+      - run:
+          command: |
+            mkdir output
+            mv ./rise-launcher-electron-e2e/*screenshot.jpg output
+          when: always
       - store_artifacts:
           path: output
+          when: always
 
   deploy-production:
     parameters:
