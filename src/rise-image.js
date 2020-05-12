@@ -402,7 +402,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   _handleStartForPreview() {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
+      fileUrl: RiseImage.STORAGE_PREFIX + encodeURI( file ) + "?_=" +
         this._timeCreatedFor( file ),
       status: this._previewStatusFor( file )
     }));
