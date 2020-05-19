@@ -402,8 +402,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   _handleStartForPreview() {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" +
-        this._timeCreatedFor( file ),
+      fileUrl: this._getFileUrl( file ),
       status: this._previewStatusFor( file )
     }));
   }
@@ -420,13 +419,18 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     }
   }
 
+  _getFileUrl( file ) {
+    return RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
+  }
+
   _encodePath( filePath ) {
-    // do not use encodeURIComponent() because it encodes path delimiters making the URL invalid
-    // filePath example: "risemedialibrary-XYZ/folder 1/filename with%20space.jpg"
-    // encodeURIComponent() -> "risemedialibrary-XYZ%2Ffolder%201%2Ffilename%20with%2520space.jpg"
-    // encodeURI() -> "risemedialibrary-XYZ/folder%201/filename%20with%2520space.jpg"
-    
-    return encodeURI( filePath );
+    // encode each element of the path separatly
+
+    let encodedPath = filePath.split("/")
+    .map( pathElement => encodeURIComponent( pathElement ))
+    .join("/");
+
+    return encodedPath;
   }
 
   watchedFileErrorCallback() {

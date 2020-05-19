@@ -255,6 +255,27 @@
           } );
         } );
 
+        suite( "_getFileUrl", () => {
+
+          test( "should encode file path", (done) => {
+            let filePath = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/unit-test-do-not-delete/Ü-+ test%20encoding ([!@?,#$])=1+2-A&%.jpg";
+            let fileUrl = element._getFileUrl( filePath );
+
+            assert.isTrue(fileUrl.indexOf("/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/") > 0, "forward slash in file path is not encoded" );
+
+            fetch(fileUrl)
+            .then( (res) => {
+                assert.isTrue(res.status === 200);
+                done();
+            } )
+            .catch( (error) => {
+              assert.fail( error );
+              done();
+            } );
+          } );
+
+        } );
+
         suite( "_handleStartForPreview", () => {
           setup( () => {
             sinon.stub(element.__proto__.__proto__, "handleFileStatusUpdated");
