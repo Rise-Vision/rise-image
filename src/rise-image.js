@@ -402,8 +402,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   _handleStartForPreview() {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
-      fileUrl: RiseImage.STORAGE_PREFIX + encodeURIComponent( file ) + "?_=" +
-        this._timeCreatedFor( file ),
+      fileUrl: this._getFileUrl( file ),
       status: this._previewStatusFor( file )
     }));
   }
@@ -418,6 +417,20 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
       this._start();
     }
+  }
+
+  _getFileUrl( file ) {
+    return RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
+  }
+
+  _encodePath( filePath ) {
+    // encode each element of the path separatly
+
+    let encodedPath = filePath.split("/")
+    .map( pathElement => encodeURIComponent( pathElement ))
+    .join("/");
+
+    return encodedPath;
   }
 
   watchedFileErrorCallback() {
