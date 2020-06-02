@@ -5,12 +5,15 @@ import { html } from "@polymer/polymer/lib/utils/html-tag.js";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
 import { WatchFilesMixin } from "rise-common-component/src/watch-files-mixin";
 import { ValidFilesMixin } from "rise-common-component/src/valid-files-mixin";
+import { StoreFilesMixin } from "rise-common-component/src/store-files-mixin";
 import { version } from "./rise-image-version.js";
 import "@polymer/iron-image/iron-image.js";
 
 export const VALID_FILE_TYPES = [ "jpg", "jpeg", "png", "bmp", "svg", "gif", "webp" ];
 
-class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
+const base = StoreFilesMixin(RiseElement);
+
+class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   static get template() {
     return html`
       <style>
@@ -352,6 +355,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this._validFiles = validFiles;
 
       if ( RisePlayerConfiguration.isPreview()) {
+        super.getFile( "test" );
         return this._handleStartForPreview();
       }
 
