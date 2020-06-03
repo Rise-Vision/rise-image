@@ -112,6 +112,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
 
     this.addEventListener( "rise-presentation-play", () => this._reset());
     this.addEventListener( "rise-presentation-stop", () => this._stop());
+
+    super.initCache({
+      name: `${this.tagName.toLowerCase()}_v${version.charAt(0)}`,
+      expiry: 1000 * 60 * 60 * 24 * 7
+    });
   }
 
   _configureImageEventListeners() {
