@@ -53,6 +53,8 @@
             error: () => {}
           };
 
+          RisePlayerConfiguration.isPreview = () => false;
+
           element = fixture("test-block");
         });
 
@@ -215,11 +217,14 @@
             sinon.stub(element, "_getDataUrlFromSVGLocalUrl").callsFake(() => {
               return Promise.resolve("dataurl");
             });
+            sinon.stub(element, '_renderImageForPreview');
           } );
 
           teardown( () => {
             element.$.image.updateStyles.restore();
             element._getDataUrlFromSVGLocalUrl.restore();
+            element._renderImageForPreview.restore();
+            RisePlayerConfiguration.isPreview = () => false;
           } );
 
           test( "should ignore width/height/sizing/position and apply responsive styling", () => {
@@ -252,6 +257,14 @@
             element._renderImage( "risemedialibrary-abc123/test.svg", "https://storage.googleapis.com/risemedialibrary-abc123/test.svg" );
 
             assert.isTrue( element._getDataUrlFromSVGLocalUrl.called );
+          } );
+
+          test( "should call _renderImageForPreview() when running in Preview", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._renderImage( "risemedialibrary-abc123/test.jpg", "https://storage.googleapis.com/risemedialibrary-abc123/test.jpg" );
+
+            assert.isTrue( element._renderImageForPreview.called );
           } );
         } );
 
@@ -790,6 +803,57 @@
 
             assert.deepEqual( element._filesToRenderList, [] );
             assert.equal( element._clearDisplayedImage.callCount, 1 );
+          });
+        });
+
+        suite( "watchedFileAddedCallback", () => {
+          const sandbox = sinon.createSandbox();
+
+          setup( () => {
+            sandbox.stub(element, '_configureShowingImages');
+          });
+
+          teardown( () => {
+            sandbox.restore();
+            RisePlayerConfiguration.isPreview = () => false;
+          });
+
+          test( "should not call configureShowingImages when running in Preview and full list isn't managed yet", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._validFiles = [ "risemedialibrary-abc123/testing/a.jpg", "risemedialibrary-abc123/testing/b.jpg", "risemedialibrary-abc123/testing/c.jpg" ];
+            element.managedFiles = [ {
+              filePath: "risemedialibrary-abc123/testing/a.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/a.jpg",
+              order: 0
+            } ]
+
+            element.watchedFileAddedCallback();
+
+            assert.isFalse( element._configureShowingImages.called );
+          });
+
+          test( "should call configureShowingImages when running in Preview and full list is now managed", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._validFiles = [ "risemedialibrary-abc123/testing/a.jpg", "risemedialibrary-abc123/testing/b.jpg", "risemedialibrary-abc123/testing/c.jpg" ];
+            element.managedFiles = [ {
+              filePath: "risemedialibrary-abc123/testing/a.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/a.jpg",
+              order: 0
+            }, {
+                filePath: "risemedialibrary-abc123/testing/b.jpg",
+                fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/b.jpg",
+                order: 1
+            }, {
+              filePath: "risemedialibrary-abc123/testing/c.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/c.jpg",
+              order: 2
+            } ]
+
+            element.watchedFileAddedCallback();
+
+            assert.isTrue( element._configureShowingImages.called );
           });
         });
 
