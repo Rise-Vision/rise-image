@@ -240,6 +240,16 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     });
   }
 
+  _renderImageForPreview( fileUrl ) {
+    // TODO: call super.getFile( fileUrl )
+    // TODO: ensure a catch to handle error
+    // TODO: on successfull resolve, set the src on image instance below with the provided objectUrl
+    // TODO: revoke the previously stored objectUrl and now store reference to latest objectUrl
+
+    // for now set src to the fileUrl until the above functionality is in place
+    this.$.image.src = fileUrl;
+  }
+
   _renderImage( filePath, fileUrl ) {
     if ( this.responsive ) {
       this.$.image.updateStyles({ "--iron-image-width": "100%", "width": "100%", "height": "auto", "display": "inline-block" });
@@ -249,6 +259,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
       this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;
       this.$.image.sizing = this.sizing;
       this.$.image.position = this.position;
+    }
+
+    if ( RisePlayerConfiguration.isPreview() ) {
+      return this._renderImageForPreview( fileUrl );
     }
 
     if ( super.getStorageFileFormat( filePath ) === "svg" ) {
@@ -360,7 +374,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
       this._validFiles = validFiles;
 
       if ( RisePlayerConfiguration.isPreview()) {
-        super.getFile( "test" );
         return this._handleStartForPreview();
       }
 
@@ -452,9 +465,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   watchedFileAddedCallback() {
+    if ( RisePlayerConfiguration.isPreview() && this.managedFiles.length !== this._validFiles.length ) {
+      // For preview we wait until watchFilesMixin is managing full list of valid files
+      return;
+    }
+
     this._configureShowingImages();
   }
-
 
   watchedFileDeletedCallback( details ) {
     const { filePath } = details;
