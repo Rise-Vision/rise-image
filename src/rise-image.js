@@ -240,8 +240,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     });
   }
 
-  _renderImageForPreview( filePath ) {
-    super.getFile( this._getFileUrl(filePath))
+  _renderImageForPreview( fileUrl ) {
+    super.getFile( fileUrl )
       .then( objectUrl => {
         if ( typeof objectUrl === "string" ) {
           this.$.image.src = objectUrl;
@@ -267,7 +267,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     }
 
     if ( RisePlayerConfiguration.isPreview() ) {
-      return this._renderImageForPreview( filePath );
+      return this._renderImageForPreview( fileUrl );
     }
 
     if ( super.getStorageFileFormat( filePath ) === "svg" ) {
@@ -335,6 +335,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
 
   _configureShowingImages() {
     this._filesToRenderList = this.managedFiles
+      .slice( 0 )
       .filter( f => this._validFiles.includes( f.filePath ));
 
     this._transitionIndex = 0;
