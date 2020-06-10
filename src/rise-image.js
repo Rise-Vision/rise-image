@@ -240,14 +240,19 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     });
   }
 
-  _renderImageForPreview( fileUrl ) {
-    // TODO: call super.getFile( fileUrl )
-    // TODO: ensure a catch to handle error
-    // TODO: on successfull resolve, set the src on image instance below with the provided objectUrl
+  _renderImageForPreview( filePath ) {
+    super.getFile( this._getFileUrl(filePath))
+      .then( objectUrl => {
+        if ( typeof objectUrl === "string" ) {
+          this.$.image.src = objectUrl;
+        } else {
+          throw new Error( "Invalid file url!" );
+        }
+      }).catch( error => {
+        // TODO: handle error
+        console.error( error );
+      })
     // TODO: revoke the previously stored objectUrl and now store reference to latest objectUrl
-
-    // for now set src to the fileUrl until the above functionality is in place
-    this.$.image.src = fileUrl;
   }
 
   _renderImage( filePath, fileUrl ) {
@@ -262,7 +267,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     }
 
     if ( RisePlayerConfiguration.isPreview() ) {
-      return this._renderImageForPreview( fileUrl );
+      return this._renderImageForPreview( filePath );
     }
 
     if ( super.getStorageFileFormat( filePath ) === "svg" ) {
@@ -330,7 +335,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
 
   _configureShowingImages() {
     this._filesToRenderList = this.managedFiles
-      .slice( 0 )
       .filter( f => this._validFiles.includes( f.filePath ));
 
     this._transitionIndex = 0;
