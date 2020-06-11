@@ -241,13 +241,18 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _renderImageForPreview( fileUrl ) {
-    // TODO: call super.getFile( fileUrl )
-    // TODO: ensure a catch to handle error
-    // TODO: on successfull resolve, set the src on image instance below with the provided objectUrl
+    super.getFile( fileUrl )
+      .then( objectUrl => {
+        if ( typeof objectUrl === "string" ) {
+          this.$.image.src = objectUrl;
+        } else {
+          throw new Error( "Invalid file url!" );
+        }
+      }).catch( error => {
+        // TODO: handle error
+        console.error( error );
+      })
     // TODO: revoke the previously stored objectUrl and now store reference to latest objectUrl
-
-    // for now set src to the fileUrl until the above functionality is in place
-    this.$.image.src = fileUrl;
   }
 
   _renderImage( filePath, fileUrl ) {
