@@ -268,6 +268,31 @@
           } );
         } );
 
+        suite( "_renderImageForPreview", () => {
+          setup( () => {
+            sinon.stub(element.__proto__.__proto__.__proto__, "getFile").resolves("test object url");
+          } );
+
+          teardown( () => {
+            element.__proto__.__proto__.__proto__.getFile.restore();
+          } );
+
+          test( "should make getFile() call of StoreFilesMixin with correct file url", () => {
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_="));
+          } );
+
+          test( "should set src of image with object url", (done) => {
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            setTimeout(() => {
+              assert.equal(element.$.image.src, "test object url");
+              done();
+            }, 100);
+          } );
+        } );
+
         suite( "_getFileUrl", () => {
 
           test( "should encode file path", (done) => {
