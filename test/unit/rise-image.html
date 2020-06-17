@@ -331,7 +331,7 @@
 
             assert.isTrue( element.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               status: "current"
             } ));
           } );
@@ -342,19 +342,19 @@
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png",
               status: "current"
             } );
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png?_=",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png",
               status: "current"
             } );
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png?_=",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png",
               status: "current"
             } );
           } );
@@ -369,7 +369,7 @@
 
             assert.isTrue( element.__proto__.__proto__.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=123",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               status: "current"
             } ));
           } );
