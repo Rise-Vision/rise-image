@@ -245,7 +245,7 @@
 
         // delay to account for promise resolve
         setTimeout(() => {
-          assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_="));
+          assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png"));
           assert.equal(element.$.image.src, "test object url");
           done();
         }, 100);
