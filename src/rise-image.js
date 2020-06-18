@@ -445,17 +445,15 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _getFileUrl( file ) {
-    return RiseImage.STORAGE_PREFIX + this._encodePath( file );
+    return `${RiseImage.STORAGE_PREFIX}storage/v1/b/${this._constructPath( file )}`;
   }
 
-  _encodePath( filePath ) {
-    // encode each element of the path separatly
+  _constructPath( filePath ) {
+    const path = filePath.split("risemedialibrary-")[1];
+    const bucket = path.slice(0, path.indexOf("/"));
+    const object = encodeURIComponent(path.slice(path.indexOf("/") + 1));
 
-    let encodedPath = filePath.split("/")
-    .map( pathElement => encodeURIComponent( pathElement ))
-    .join("/");
-
-    return encodedPath;
+    return `risemedialibrary-${bucket}/o/${object}?alt=media`;
   }
 
   watchedFileErrorCallback() {
