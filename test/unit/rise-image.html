@@ -294,12 +294,11 @@
         } );
 
         suite( "_getFileUrl", () => {
-
-          test( "should return correctly constructed url for GCS JSON API", (done) => {
+          test( "should encode file path", (done) => {
             let filePath = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/unit-test-do-not-delete/Ü-+ test%20encoding ([!@?,#$])=1+2-A&%.jpg";
             let fileUrl = element._getFileUrl( filePath );
 
-            assert.equal(fileUrl, "https://storage.googleapis.com/storage/v1/b/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/o/unit-test-do-not-delete%2FU%CC%88-%2B%20test%2520encoding%20(%5B!%40%3F%2C%23%24%5D)%3D1%2B2-A%26%25.jpg?alt=media");
+            assert.isTrue(fileUrl.indexOf("/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/") > 0, "forward slash in file path is not encoded" );
 
             fetch(fileUrl)
               .then( (res) => {
@@ -310,8 +309,7 @@
                 assert.fail( error );
                 done();
               } );
-          } );
-
+          });
         } );
 
         suite( "_handleStartForPreview", () => {
@@ -331,7 +329,7 @@
 
             assert.isTrue( element.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/storage/v1/b/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/o/logo.png?alt=media",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               status: "current"
             } ));
           } );
@@ -342,19 +340,19 @@
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[0][0], {
               filePath: "risemedialibrary-abc123/test1.png",
-              fileUrl: "https://storage.googleapis.com/storage/v1/b/risemedialibrary-abc123/o/test1.png?alt=media",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.png",
               status: "current"
             } );
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[1][0], {
               filePath: "risemedialibrary-abc123/test2.png",
-              fileUrl: "https://storage.googleapis.com/storage/v1/b/risemedialibrary-abc123/o/test2.png?alt=media",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.png",
               status: "current"
             } );
 
             assert.deepEqual( element.__proto__.__proto__.handleFileStatusUpdated.args[2][0], {
               filePath: "risemedialibrary-abc123/test3.png",
-              fileUrl: "https://storage.googleapis.com/storage/v1/b/risemedialibrary-abc123/o/test3.png?alt=media",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.png",
               status: "current"
             } );
           } );
@@ -369,7 +367,7 @@
 
             assert.isTrue( element.__proto__.__proto__.handleFileStatusUpdated.calledWith({
               filePath: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
-              fileUrl: "https://storage.googleapis.com/storage/v1/b/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/o/logo.png?alt=media",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png",
               status: "current"
             } ));
           } );

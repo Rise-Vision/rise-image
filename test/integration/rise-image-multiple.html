@@ -344,7 +344,7 @@
 
         // delay to account for promise resolve
         setTimeout(() => {
-          assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/storage/v1/b/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/o/rise-image-demo%2Fcanadiens_logo.gif?alt=media"));
+          assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif"));
           assert.equal(element.$.image.src, "test object url");
           done();
         }, 100);
@@ -364,9 +364,9 @@
 
         // delay to account for promise resolve
         setTimeout(() => {
-          assert.equal(element.getFile.args[0][0], "https://storage.googleapis.com/storage/v1/b/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/o/rise-image-demo%2Fcanadiens_logo.gif?alt=media");
-          assert.equal(element.getFile.args[1][0], "https://storage.googleapis.com/storage/v1/b/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/o/rise-image-demo%2Fblue-jays-logo.jpg?alt=media");
-          assert.equal(element.getFile.args[2][0], "https://storage.googleapis.com/storage/v1/b/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/o/rise-image-demo%2Fraptors_logo.png?alt=media");
+          assert.equal(element.getFile.args[0][0], "https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif");
+          assert.equal(element.getFile.args[1][0], "https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/blue-jays-logo.jpg");
+          assert.equal(element.getFile.args[2][0], "https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/raptors_logo.png");
           assert.equal(element.$.image.src, "test object url");
 
           element._startTransitionTimer.restore();
