@@ -377,7 +377,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
       }
     }
 
-    const { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
+    let { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
+
+    if ( RisePlayerConfiguration.isPreview() ) {
+      validFiles = this._filterDeletedFilesForPreview( validFiles );
+    }
 
     if ( !validFiles || !validFiles.length ) {
       this._validFiles = [];
@@ -424,11 +428,19 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     return entry && entry.exists ? "current" : "deleted";
   }
 
+  _filterDeletedFilesForPreview( files ) {
+    if ( !files || !Array.isArray( files ) ) {
+      return [];
+    }
+
+    return files.filter( file => this._previewStatusFor( file ) !== "deleted" );
+  }
+
   _handleStartForPreview() {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
       fileUrl: this._getFileUrl( file ),
-      status: this._previewStatusFor( file )
+      status: "current"
     }));
   }
 

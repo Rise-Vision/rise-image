@@ -936,6 +936,32 @@
           });
         } );
 
+        suite( "_filterDeletedFilesForPreview", () => {
+          setup( () => {
+            element = fixture( "test-block" );
+          });
+
+          test( "should return empty array if files param is invalid", () => {
+            assert.deepEqual(element._filterDeletedFilesForPreview(), []);
+            assert.deepEqual(element._filterDeletedFilesForPreview("test"), []);
+            assert.deepEqual(element._filterDeletedFilesForPreview(123), []);
+          } );
+
+          test( "should return list of files with deleted files filtered out as per metadata", () => {
+            element.metadata = [ { file: "test1.jpg", exists: true }, { file: "test2.jpg", exists: false }, { file: "test3.jpg", exists: true } ];
+
+            assert.deepEqual(element._filterDeletedFilesForPreview(["test1.jpg", "test2.jpg", "test3.jpg"]), [
+              "test1.jpg", "test3.jpg"
+            ]);
+          } );
+
+          test( "should return correct list of files when no metadata exists", () => {
+            const list = ["test1.jpg", "test2.jpg", "test3.jpg"];
+
+            assert.deepEqual(element._filterDeletedFilesForPreview(list), list);
+          } );
+        } );
+
       });
     </script>
   </body>
