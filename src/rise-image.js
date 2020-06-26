@@ -436,6 +436,16 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     return files.filter( file => this._previewStatusFor( file ) !== "deleted" );
   }
 
+  _timeCreatedFor( file ) {
+    if ( !this._hasMetadata()) {
+      return "";
+    }
+
+    const entry = this._metadataEntryFor( file );
+
+    return entry && entry[ "time-created" ] ? entry[ "time-created" ] : "";
+  }
+
   _handleStartForPreview() {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
@@ -457,7 +467,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _getFileUrl( file ) {
-    return RiseImage.STORAGE_PREFIX + this._encodePath( file );
+    return RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
   }
 
   _encodePath( filePath ) {
