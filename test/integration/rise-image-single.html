@@ -64,6 +64,10 @@
         RisePlayerConfiguration.LocalMessaging = {
           isConnected: () => { return true; }
         }
+
+        RisePlayerConfiguration.Helpers = {
+          isEditorPreview: () => {return false;}
+        };
       });
 
       teardown(() => {
