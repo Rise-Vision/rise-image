@@ -53,6 +53,10 @@
             error: () => {}
           };
 
+          RisePlayerConfiguration.Helpers = {
+            isEditorPreview: () => {return false;}
+          };
+
           RisePlayerConfiguration.isPreview = () => false;
 
           element = fixture("test-block");
@@ -280,16 +284,25 @@
           test( "should make getFile() call of StoreFilesMixin with correct file url", () => {
             element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
 
-            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_="));
+            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", false));
           } );
 
           test( "should set src of image with object url", (done) => {
             element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
 
             setTimeout(() => {
+              assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", false));
               assert.equal(element.$.image.src, "test object url");
               done();
             }, 100);
+          } );
+
+          test( "should set flag to omit checking cached status if running on Editor Preview", () => {
+            sinon.stub(RisePlayerConfiguration.Helpers, "isEditorPreview").returns(true);
+
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", true));
           } );
         } );
 

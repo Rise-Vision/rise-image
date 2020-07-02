@@ -249,7 +249,14 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _renderImageForPreview( fileUrl ) {
-    super.getFile( fileUrl )
+    /*
+      Ensure to set 'omitCheckingCachedStatus' flag to true on getFile() call if running in Editor Preview to avoid unnecessary HEAD requests
+      This is because we append 'time-created' value from metadata in the file url to ensure we get the latest version of file,
+      as well as we check 'exists' in metadata to ensure to filter out a deleted file(s) upon start/reset
+     */
+    const omitCheckingCachedStatus = RisePlayerConfiguration.Helpers.isEditorPreview();
+
+    super.getFile( fileUrl, omitCheckingCachedStatus )
       .then( objectUrl => {
         if ( typeof objectUrl === "string" ) {
           this.$.image.src = objectUrl;
@@ -260,7 +267,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
         // TODO: handle error
         console.error( error );
       })
-    // TODO: revoke the previously stored objectUrl and now store reference to latest objectUrl
   }
 
   _renderImage( filePath, fileUrl ) {
