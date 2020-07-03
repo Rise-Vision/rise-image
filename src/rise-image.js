@@ -324,6 +324,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
       this._renderImage( fileToRender.filePath, fileToRender.fileUrl );
       this._startTransitionTimer();
     } else {
+      if ( this._filesToRenderList.length === 1 ) {
+        // single image, no need to run _configureShowingImages, just run transition timer
+        return this._startTransitionTimer();
+      }
+
       this._configureShowingImages();
     }
   }

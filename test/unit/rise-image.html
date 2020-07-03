@@ -478,6 +478,8 @@
 
             setup( () => {
               sandbox.stub(element.__proto__.__proto__, '_sendDoneEvent');
+              sandbox.spy(element, "_configureShowingImages");
+              sandbox.spy(element, "_startTransitionTimer");
             });
 
             teardown( () => {
@@ -504,6 +506,30 @@
               element._onShowImageComplete();
 
               assert.equal( element._transitionIndex, 1);
+            });
+
+            test("should only start transition timer if managing single image", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesToRenderList = [{ filePath: "risemedialibrary-abc123/test.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test.jpg"}];
+
+              element._onShowImageComplete();
+
+              assert.isTrue( element._startTransitionTimer.called);
+              assert.isFalse( element._configureShowingImages.called);
+            });
+
+            test("should only call _configureShowingImages when managing multiple images and cycle is complete", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 2;
+              element._filesToRenderList = [{ filePath: "risemedialibrary-abc123/test1.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.jpg"}, { filePath: "risemedialibrary-abc123/test2.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.jpg"}, { filePath: "risemedialibrary-abc123/test3.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.jpg"}];
+
+              element._onShowImageComplete();
+
+              assert.isFalse( element._startTransitionTimer.called);
+              assert.isTrue( element._configureShowingImages.called);
             });
 
           });
