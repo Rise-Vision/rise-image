@@ -191,6 +191,7 @@
 
           test( "should reset internals, clear displayed image, and call _start() only if not initial start", () => {
             sinon.spy( element, "_clearDisplayedImage" );
+            sinon.spy( element, "_revokeObjectUrl" );
 
             element._initialStart = false;
             element._watchInitiated = true;
@@ -211,6 +212,7 @@
             assert.equal( element._transitionIndex, 0 );
             assert.isTrue( element._clearDisplayedImage.called );
             assert.isTrue( element._start.calledOnce );
+            assert.isTrue( element._revokeObjectUrl.called );
           } );
 
         } );
@@ -275,12 +277,11 @@
         suite( "_renderImageForPreview", () => {
           setup( () => {
             sinon.stub(element.__proto__.__proto__.__proto__, "getFile").resolves("test object url");
-            sinon.stub(URL, "revokeObjectURL");
+            sinon.spy(element, "_revokeObjectUrl");
             RisePlayerConfiguration.isPreview = () => true;
           } );
 
           teardown( () => {
-            URL.revokeObjectURL.restore();
             RisePlayerConfiguration.isPreview = () => false;
             element.__proto__.__proto__.__proto__.getFile.restore();
           } );
@@ -296,7 +297,7 @@
 
             setTimeout(() => {
               assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", false));
-              assert.isTrue(URL.revokeObjectURL.called);
+              assert.isTrue(element._revokeObjectUrl.called);
               assert.equal(element.$.image.src, "test object url");
               done();
             }, 100);
@@ -897,6 +898,39 @@
             assert.isTrue( element._configureShowingImages.called );
           });
         });
+
+        suite( "_revokeObjectUrl", () => {
+          setup( () => {
+            sinon.stub(URL, "revokeObjectURL");
+            RisePlayerConfiguration.isPreview = () => true;
+            element.$.image.src = "test object url";
+          } );
+
+          teardown( () => {
+            URL.revokeObjectURL.restore();
+            RisePlayerConfiguration.isPreview = () => false;
+          } );
+
+          test( "should revoke object url", () => {
+            element._revokeObjectUrl();
+
+            assert.isTrue(URL.revokeObjectURL.called);
+          } );
+
+          test( "should not execute revoke if src is empty", () => {
+            element.$.image.src = "";
+            element._revokeObjectUrl();
+
+            assert.isFalse(URL.revokeObjectURL.called);
+          } );
+
+          test( "should not execute revoke if not running in Preview", () => {
+            RisePlayerConfiguration.isPreview = () => false;
+            element._revokeObjectUrl();
+
+            assert.isFalse(URL.revokeObjectURL.called);
+          } );
+        } );
 
         suite( "_filterDeletedFilesForPreview", () => {
           setup( () => {
