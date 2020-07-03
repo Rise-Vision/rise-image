@@ -402,7 +402,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _stop() {
-    if (this.$.image.src) {
+    if (RisePlayerConfiguration.isPreview() && this.$.image.src) {
       URL.revokeObjectURL(this.$.image.src);
     }
 
