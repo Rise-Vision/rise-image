@@ -141,21 +141,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
         storage: super.getStorageData( filePath, fileUrl )
       });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
-      this._revokeObjectUrl();
     });
 
     this.$.image.addEventListener( "loaded-changed", event => {
       if ( event.detail.value === true ) {
         super._setUptimeError( false );
-        this._revokeObjectUrl();
       }
     });
-  }
-
-  _revokeObjectUrl() {
-    if ( RisePlayerConfiguration.isPreview() && this.$.image.src ) {
-      URL.revokeObjectURL( this.$.image.src );
-    }
   }
 
   _isLogoChanged() {
@@ -259,6 +251,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
     super.getFile( fileUrl, omitCheckingCachedStatus )
       .then( objectUrl => {
         if ( typeof objectUrl === "string" ) {
+          URL.revokeObjectURL(this.$.image.src);
           this.$.image.src = objectUrl;
         } else {
           throw new Error( "Invalid file url!" );
@@ -409,6 +402,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   }
 
   _stop() {
+    if (this.$.image.src) {
+      URL.revokeObjectURL(this.$.image.src);
+    }
+
     this._validFiles = [];
     this._filesToRenderList = [];
 
