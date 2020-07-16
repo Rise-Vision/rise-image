@@ -11,12 +11,12 @@ The below illustrates simple usage of the component. An example of a working ima
 https://github.com/Rise-Vision/html-template-library/tree/master/example-pud-image
 
 #### HTML
-Add a reference to the component in the <head> section of template.html.
+Add a reference to the component in the `<head>` section of **template.html**.
 ```
 <script src="https://widgets.risevision.com/stable/components/rise-image/1/rise-image.js"></script>
 ```
 
-Add an instance of the component to <body> section of template.html.
+Add an instance of the component to `<body>` section of **template.html**.
 ```
   <body>
     <div id="image-sample-container">
@@ -33,7 +33,7 @@ Add an instance of the component to <body> section of template.html.
 ```
 
 #### JS
-To test the template in a browser outside Player/Apps, add the following lines (replacing with the appropriate element id. Comment before committing.
+To test the template in a browser outside Player/Apps, add the following lines (replacing with the appropriate element id to **main.js**. Note: Comment before committing.
 
 ```
 const image = document.getElementById( "rise-image-01" );
@@ -42,7 +42,7 @@ const image = document.getElementById( "rise-image-01" );
 RisePlayerConfiguration.Helpers.sendStartEvent( image );
 ```
 #### JSON
-For npm 
+For npm to install dependencies neccesssary add refrences to component repo in **package.json**.
 ```
 "dependencies": {
     "rise-image": "git://github.com/Rise-Vision/rise-image.git",
@@ -50,6 +50,18 @@ For npm
     ...
   },
 ```
+
+#### Build and Test Locally in Browswer 
+Execute the following commands in Terminal and preview template.html in browser.  example: http://localhost:8081/build/prod/src/template.html:
+
+```
+npm install
+npm install -g polymer-cli@1.9.7
+npm run build
+python -m SimpleHTTPServer 8081
+```
+For more specifics please see: HTML Template - Build and Test Locally in Browser Documentation. 
+https://docs.google.com/document/d/1_xgKe790ZuweDVg-Abj3032an6we7YLH_lQPpe-M88M/edit#bookmark=id.21c68d5f8a7c
 
 
 ### Label & Help Text
@@ -110,9 +122,6 @@ The component is listening for the following events:
 When configured with the `play-until-done` attribute the component checks if it is done on every image transition and sends the `"report-done"` event to the template.
 
 If there is a single image configured in `files` or no image at all the event is sent after the time configured in the `duration` attribute or 10 seconds if no duration is set. 
-
-### Build and Test Locally in Browswer 
-https://docs.google.com/document/d/1_xgKe790ZuweDVg-Abj3032an6we7YLH_lQPpe-M88M/edit#bookmark=id.21c68d5f8a7c
 
 ## Development
 Instructions for demo page here:
