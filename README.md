@@ -36,10 +36,14 @@ Add an instance of the component to `<body>` section of **template.html**.
 To test the template in a browser outside Player/Apps, add the following lines (replacing with the appropriate element id to **main.js**. Note: Comment before committing.
 
 ```
+function configureComponents {
 const image = document.getElementById( "rise-image-01" );
 
 //Uncomment when testing in browser
 RisePlayerConfiguration.Helpers.sendStartEvent( image );
+}
+
+window.addEventListener( "rise-components-ready", configureComponents );
 ```
 #### JSON
 For npm to install dependencies neccesssary add refrences to component repo in **package.json**.
