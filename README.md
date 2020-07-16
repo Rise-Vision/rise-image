@@ -4,14 +4,11 @@
 
 `rise-image` is a Polymer 3 Web Component that retrieves image files from Rise Local Storage, and displays them.
 
-Instructions for demo page here:
-https://github.com/Rise-Vision/rise-image/blob/master/demo/README.md
+## Usage for Designers
+### Integration in a Template
 
-## Usage in Template
-
-The below illustrates simple usage of the component.
-
-There is no need to configure listeners if the component runs as editable ( default operation mode ). See the demo section in this repo for a full working example of an HTML page using the component which will illustrate required imports in the `<head>` of the page.
+The below illustrates simple usage of the component. An example of a working image component in a Template can be found here: 
+https://github.com/Rise-Vision/html-template-library/tree/master/example-pud-image
 
 #### HTML
 Add a reference to the component in the <head> section of template.html.
@@ -37,12 +34,23 @@ Add an instance of the component to <body> section of template.html.
 
 #### JS
 To test the template in a browser outside Player/Apps, add the following lines (replacing with the appropriate element id. Comment before committing.
+
 ```
 const image = document.getElementById( "rise-image-01" );
 
 //Uncomment when testing in browser
 RisePlayerConfiguration.Helpers.sendStartEvent( image );
 ```
+#### JSON
+For npm 
+```
+"dependencies": {
+    "rise-image": "git://github.com/Rise-Vision/rise-image.git",
+    "@webcomponents/webcomponentsjs": "^2.1.1"
+    ...
+  },
+```
+
 
 ### Label & Help Text
 
@@ -101,18 +109,21 @@ The component is listening for the following events:
 
 When configured with the `play-until-done` attribute the component checks if it is done on every image transition and sends the `"report-done"` event to the template.
 
-If there is a single image configured in `files` or no image at all the event is sent after the time configured in the `duration` attribute or 10 seconds if no duration is set.
+If there is a single image configured in `files` or no image at all the event is sent after the time configured in the `duration` attribute or 10 seconds if no duration is set. 
 
+### Build and Test Locally in Browswer 
+https://docs.google.com/document/d/1_xgKe790ZuweDVg-Abj3032an6we7YLH_lQPpe-M88M/edit#bookmark=id.21c68d5f8a7c
 
+## Development
+Instructions for demo page here:
+https://github.com/Rise-Vision/rise-image/blob/master/demo/README.md
 
-## Built With
+### Built With
 - [Polymer 3](https://www.polymer-project.org/)
 - [Polymer CLI](https://github.com/Polymer/tools/tree/master/packages/cli)
 - [Polymer iron-image](https://github.com/PolymerElements/iron-image)
 - [WebComponents Polyfill](https://www.webcomponents.org/polyfills/)
 - [npm](https://www.npmjs.org)
-
-## Development
 
 ### Local Development Build
 Clone this repo and change into this project directory.
