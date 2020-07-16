@@ -7,14 +7,19 @@
 Instructions for demo page here:
 https://github.com/Rise-Vision/rise-image/blob/master/demo/README.md
 
-## Usage
+## Usage in Template
 
 The below illustrates simple usage of the component.
 
 There is no need to configure listeners if the component runs as editable ( default operation mode ). See the demo section in this repo for a full working example of an HTML page using the component which will illustrate required imports in the `<head>` of the page.
 
-### Example
+#### HTML
+Add a reference to the component in the <head> section of template.html.
+```
+<script src="https://widgets.risevision.com/stable/components/rise-image/1/rise-image.js"></script>
+```
 
+Add an instance of the component to <body> section of template.html.
 ```
   <body>
     <div id="image-sample-container">
@@ -28,6 +33,15 @@ There is no need to configure listeners if the component runs as editable ( defa
 ...
 
   </body>
+```
+
+#### JS
+To test the template in a browser outside Player/Apps, add the following lines (replacing with the appropriate element id. Comment before committing.
+```
+const image = document.getElementById( "rise-image-01" );
+
+//Uncomment when testing in browser
+RisePlayerConfiguration.Helpers.sendStartEvent( image );
 ```
 
 ### Label & Help Text
@@ -89,25 +103,7 @@ When configured with the `play-until-done` attribute the component checks if it 
 
 If there is a single image configured in `files` or no image at all the event is sent after the time configured in the `duration` attribute or 10 seconds if no duration is set.
 
-### Logs to BQ
 
-The component may log the following:
-
-- **_image-start_** ( info ): The component receives the _start_ event and commences execution.
-- **_image-reset_** ( info ): The component observed changes to either _files_ or _duration_ attributes and performs a complete reset to use latest values.
-- **_image-svg-usage_** ( info ): Provides an SVG file _blob size_ and _data url length_ info for investigative purposes.
-- **_image-load-fail_** ( error ): When attempting to render an available image, the image load failed.
-- **_image-svg-fail_** ( error ): When component is targeting an SVG file, the component converts the local file URL to a data url to support running on Electron Player. This error event indicates the attempt to get data url or render the SVG file failed.
-
-Additionally, because the component inherits from [WatchFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/watch-files-mixin.js) and [ValidFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/valid-files-mixin.js) in [rise-common-component](https://github.com/Rise-Vision/rise-common-component), it may log the following:
-
-- **_file-not-found_** (error): A watched file is not found.
-- **_file-insufficient-disk-space-error_** (error): A watched file can not be downloaded due to a lack of disk space.
-- **_file-rls-error_** (error): A general RLS error is encountered for a watched file.
-- **_format-invalid_** (error): A file with an invalid extension is encountered.
-- **_all-formats-invalid_** (error): All files have invalid formats.
-
-In every case of an error, examine event-details entry and the other event fields for more information about the problem.
 
 ## Built With
 - [Polymer 3](https://www.polymer-project.org/)
@@ -160,6 +156,26 @@ You can also run a specific test page by targeting the page directly, for exampl
 ```
 http://127.0.0.1:8081/components/rise-image/test/unit/rise-image.html
 ```
+
+### Logs to BQ
+
+The component may log the following:
+
+- **_image-start_** ( info ): The component receives the _start_ event and commences execution.
+- **_image-reset_** ( info ): The component observed changes to either _files_ or _duration_ attributes and performs a complete reset to use latest values.
+- **_image-svg-usage_** ( info ): Provides an SVG file _blob size_ and _data url length_ info for investigative purposes.
+- **_image-load-fail_** ( error ): When attempting to render an available image, the image load failed.
+- **_image-svg-fail_** ( error ): When component is targeting an SVG file, the component converts the local file URL to a data url to support running on Electron Player. This error event indicates the attempt to get data url or render the SVG file failed.
+
+Additionally, because the component inherits from [WatchFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/watch-files-mixin.js) and [ValidFilesMixin](https://github.com/Rise-Vision/rise-common-component/blob/master/src/valid-files-mixin.js) in [rise-common-component](https://github.com/Rise-Vision/rise-common-component), it may log the following:
+
+- **_file-not-found_** (error): A watched file is not found.
+- **_file-insufficient-disk-space-error_** (error): A watched file can not be downloaded due to a lack of disk space.
+- **_file-rls-error_** (error): A general RLS error is encountered for a watched file.
+- **_format-invalid_** (error): A file with an invalid extension is encountered.
+- **_all-formats-invalid_** (error): All files have invalid formats.
+
+In every case of an error, examine event-details entry and the other event fields for more information about the problem.
 
 ## Submitting Issues
 If you encounter problems or find defects we really want to hear about them. If you could take the time to add them as issues to this Repository it would be most appreciated. When reporting issues, please use the following format where applicable:
