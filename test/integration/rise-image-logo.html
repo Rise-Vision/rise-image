@@ -32,6 +32,9 @@
         info: () => {},
         error: () => {},
         warning: () => {}
+      },
+      Helpers: {
+        isEditorPreview: () => {return false;}
       }
     };
 
@@ -232,16 +235,23 @@
     suite('running on preview or directly in browser', () => {
       setup(() => {
         RisePlayerConfiguration.isPreview = () => true;
+
+        sinon.stub(element.__proto__.__proto__.__proto__, "getFile").resolves("test object url");
       });
 
       teardown(() => {
         RisePlayerConfiguration.isPreview = () => false;
       });
 
-      test('it should render image with a cache bumper parameter', () => {
+      test('it should render image with an object url', (done) => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=");
+        // delay to account for promise resolve
+        setTimeout(() => {
+          assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_="));
+          assert.equal(element.$.image.src, "test object url");
+          done();
+        }, 100);
       });
 
     });

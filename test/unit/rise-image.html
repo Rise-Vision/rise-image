@@ -53,6 +53,12 @@
             error: () => {}
           };
 
+          RisePlayerConfiguration.Helpers = {
+            isEditorPreview: () => {return false;}
+          };
+
+          RisePlayerConfiguration.isPreview = () => false;
+
           element = fixture("test-block");
         });
 
@@ -185,6 +191,7 @@
 
           test( "should reset internals, clear displayed image, and call _start() only if not initial start", () => {
             sinon.spy( element, "_clearDisplayedImage" );
+            sinon.spy( element, "_revokeObjectUrl" );
 
             element._initialStart = false;
             element._watchInitiated = true;
@@ -205,6 +212,7 @@
             assert.equal( element._transitionIndex, 0 );
             assert.isTrue( element._clearDisplayedImage.called );
             assert.isTrue( element._start.calledOnce );
+            assert.isTrue( element._revokeObjectUrl.called );
           } );
 
         } );
@@ -215,11 +223,14 @@
             sinon.stub(element, "_getDataUrlFromSVGLocalUrl").callsFake(() => {
               return Promise.resolve("dataurl");
             });
+            sinon.stub(element, '_renderImageForPreview');
           } );
 
           teardown( () => {
             element.$.image.updateStyles.restore();
             element._getDataUrlFromSVGLocalUrl.restore();
+            element._renderImageForPreview.restore();
+            RisePlayerConfiguration.isPreview = () => false;
           } );
 
           test( "should ignore width/height/sizing/position and apply responsive styling", () => {
@@ -253,10 +264,55 @@
 
             assert.isTrue( element._getDataUrlFromSVGLocalUrl.called );
           } );
+
+          test( "should call _renderImageForPreview() when running in Preview", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._renderImage( "risemedialibrary-abc123/test.jpg", "https://storage.googleapis.com/risemedialibrary-abc123/test.jpg" );
+
+            assert.isTrue( element._renderImageForPreview.called );
+          } );
+        } );
+
+        suite( "_renderImageForPreview", () => {
+          setup( () => {
+            sinon.stub(element.__proto__.__proto__.__proto__, "getFile").resolves("test object url");
+            sinon.spy(element, "_revokeObjectUrl");
+            RisePlayerConfiguration.isPreview = () => true;
+          } );
+
+          teardown( () => {
+            RisePlayerConfiguration.isPreview = () => false;
+            element.__proto__.__proto__.__proto__.getFile.restore();
+          } );
+
+          test( "should make getFile() call of StoreFilesMixin with correct file url", () => {
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", false));
+          } );
+
+          test( "should set src of image with object url", (done) => {
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            setTimeout(() => {
+              assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", false));
+              assert.isTrue(element._revokeObjectUrl.called);
+              assert.equal(element.$.image.src, "test object url");
+              done();
+            }, 100);
+          } );
+
+          test( "should set flag to omit checking cached status if running on Editor Preview", () => {
+            sinon.stub(RisePlayerConfiguration.Helpers, "isEditorPreview").returns(true);
+
+            element._renderImageForPreview("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=");
+
+            assert.isTrue(element.getFile.calledWith("https://storage.googleapis.com/risemedialibrary-abc123/test1.png?_=", true));
+          } );
         } );
 
         suite( "_getFileUrl", () => {
-
           test( "should encode file path", (done) => {
             let filePath = "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/unit-test-do-not-delete/Ü-+ test%20encoding ([!@?,#$])=1+2-A&%.jpg";
             let fileUrl = element._getFileUrl( filePath );
@@ -264,16 +320,15 @@
             assert.isTrue(fileUrl.indexOf("/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/") > 0, "forward slash in file path is not encoded" );
 
             fetch(fileUrl)
-            .then( (res) => {
+              .then( (res) => {
                 assert.isTrue(res.status === 200);
                 done();
-            } )
-            .catch( (error) => {
-              assert.fail( error );
-              done();
-            } );
-          } );
-
+              } )
+              .catch( (error) => {
+                assert.fail( error );
+                done();
+              } );
+          });
         } );
 
         suite( "_handleStartForPreview", () => {
@@ -423,6 +478,8 @@
 
             setup( () => {
               sandbox.stub(element.__proto__.__proto__, '_sendDoneEvent');
+              sandbox.spy(element, "_configureShowingImages");
+              sandbox.spy(element, "_startTransitionTimer");
             });
 
             teardown( () => {
@@ -449,6 +506,30 @@
               element._onShowImageComplete();
 
               assert.equal( element._transitionIndex, 1);
+            });
+
+            test("should only start transition timer if managing single image", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 0;
+              element._filesToRenderList = [{ filePath: "risemedialibrary-abc123/test.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test.jpg"}];
+
+              element._onShowImageComplete();
+
+              assert.isTrue( element._startTransitionTimer.called);
+              assert.isFalse( element._configureShowingImages.called);
+            });
+
+            test("should only call _configureShowingImages when managing multiple images and cycle is complete", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element._transitionIndex = 2;
+              element._filesToRenderList = [{ filePath: "risemedialibrary-abc123/test1.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test1.jpg"}, { filePath: "risemedialibrary-abc123/test2.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test2.jpg"}, { filePath: "risemedialibrary-abc123/test3.jpg", fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/test3.jpg"}];
+
+              element._onShowImageComplete();
+
+              assert.isFalse( element._startTransitionTimer.called);
+              assert.isTrue( element._configureShowingImages.called);
             });
 
           });
@@ -792,6 +873,116 @@
             assert.equal( element._clearDisplayedImage.callCount, 1 );
           });
         });
+
+        suite( "watchedFileAddedCallback", () => {
+          const sandbox = sinon.createSandbox();
+
+          setup( () => {
+            sandbox.stub(element, '_configureShowingImages');
+          });
+
+          teardown( () => {
+            sandbox.restore();
+            RisePlayerConfiguration.isPreview = () => false;
+          });
+
+          test( "should not call configureShowingImages when running in Preview and full list isn't managed yet", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._validFiles = [ "risemedialibrary-abc123/testing/a.jpg", "risemedialibrary-abc123/testing/b.jpg", "risemedialibrary-abc123/testing/c.jpg" ];
+            element.managedFiles = [ {
+              filePath: "risemedialibrary-abc123/testing/a.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/a.jpg",
+              order: 0
+            } ]
+
+            element.watchedFileAddedCallback();
+
+            assert.isFalse( element._configureShowingImages.called );
+          });
+
+          test( "should call configureShowingImages when running in Preview and full list is now managed", () => {
+            RisePlayerConfiguration.isPreview = () => true;
+
+            element._validFiles = [ "risemedialibrary-abc123/testing/a.jpg", "risemedialibrary-abc123/testing/b.jpg", "risemedialibrary-abc123/testing/c.jpg" ];
+            element.managedFiles = [ {
+              filePath: "risemedialibrary-abc123/testing/a.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/a.jpg",
+              order: 0
+            }, {
+                filePath: "risemedialibrary-abc123/testing/b.jpg",
+                fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/b.jpg",
+                order: 1
+            }, {
+              filePath: "risemedialibrary-abc123/testing/c.jpg",
+              fileUrl: "https://storage.googleapis.com/risemedialibrary-abc123/testing/c.jpg",
+              order: 2
+            } ]
+
+            element.watchedFileAddedCallback();
+
+            assert.isTrue( element._configureShowingImages.called );
+          });
+        });
+
+        suite( "_revokeObjectUrl", () => {
+          setup( () => {
+            sinon.stub(URL, "revokeObjectURL");
+            RisePlayerConfiguration.isPreview = () => true;
+            element.$.image.src = "test object url";
+          } );
+
+          teardown( () => {
+            URL.revokeObjectURL.restore();
+            RisePlayerConfiguration.isPreview = () => false;
+          } );
+
+          test( "should revoke object url", () => {
+            element._revokeObjectUrl();
+
+            assert.isTrue(URL.revokeObjectURL.called);
+          } );
+
+          test( "should not execute revoke if src is empty", () => {
+            element.$.image.src = "";
+            element._revokeObjectUrl();
+
+            assert.isFalse(URL.revokeObjectURL.called);
+          } );
+
+          test( "should not execute revoke if not running in Preview", () => {
+            RisePlayerConfiguration.isPreview = () => false;
+            element._revokeObjectUrl();
+
+            assert.isFalse(URL.revokeObjectURL.called);
+          } );
+        } );
+
+        suite( "_filterDeletedFilesForPreview", () => {
+          setup( () => {
+            element = fixture( "test-block" );
+          });
+
+          test( "should return empty array if files param is invalid", () => {
+            assert.deepEqual(element._filterDeletedFilesForPreview(), []);
+            assert.deepEqual(element._filterDeletedFilesForPreview("test"), []);
+            assert.deepEqual(element._filterDeletedFilesForPreview(123), []);
+          } );
+
+          test( "should return list of files with deleted files filtered out as per metadata", () => {
+            element.metadata = [ { file: "test1.jpg", exists: true }, { file: "test2.jpg", exists: false }, { file: "test3.jpg", exists: true } ];
+
+            assert.deepEqual(element._filterDeletedFilesForPreview(["test1.jpg", "test2.jpg", "test3.jpg"]), [
+              "test1.jpg", "test3.jpg"
+            ]);
+          } );
+
+          test( "should return correct list of files when no metadata exists", () => {
+            const list = ["test1.jpg", "test2.jpg", "test3.jpg"];
+
+            assert.deepEqual(element._filterDeletedFilesForPreview(list), list);
+          } );
+        } );
 
       });
     </script>

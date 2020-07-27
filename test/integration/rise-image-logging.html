@@ -57,6 +57,10 @@
     let element;
 
     setup(() => {
+        RisePlayerConfiguration.Helpers = {
+            isEditorPreview: () => {return false;}
+        };
+
       RisePlayerConfiguration.LocalStorage = {
         watchSingleFile: ( file, handler ) => {
             handler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL });

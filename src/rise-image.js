@@ -5,12 +5,15 @@ import { html } from "@polymer/polymer/lib/utils/html-tag.js";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
 import { WatchFilesMixin } from "rise-common-component/src/watch-files-mixin";
 import { ValidFilesMixin } from "rise-common-component/src/valid-files-mixin";
+import { StoreFilesMixin } from "rise-common-component/src/store-files-mixin";
 import { version } from "./rise-image-version.js";
 import "@polymer/iron-image/iron-image.js";
 
 export const VALID_FILE_TYPES = [ "jpg", "jpeg", "png", "bmp", "svg", "gif", "webp" ];
 
-class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
+const base = StoreFilesMixin(RiseElement);
+
+class RiseImage extends WatchFilesMixin( ValidFilesMixin( base )) {
   static get template() {
     return html`
       <style>
@@ -109,6 +112,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
     this.addEventListener( "rise-presentation-play", () => this._reset());
     this.addEventListener( "rise-presentation-stop", () => this._stop());
+
+    super.initCache({
+      name: `${this.tagName.toLowerCase()}_v${version.charAt(0)}`,
+      expiry: 1000 * 60 * 60 * 24 * 7
+    });
   }
 
   _configureImageEventListeners() {
@@ -140,6 +148,12 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
         super._setUptimeError( false );
       }
     });
+  }
+
+  _revokeObjectUrl() {
+    if ( RisePlayerConfiguration.isPreview() && this.$.image.src ) {
+      URL.revokeObjectURL( this.$.image.src );
+    }
   }
 
   _isLogoChanged() {
@@ -232,6 +246,28 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     });
   }
 
+  _renderImageForPreview( fileUrl ) {
+    /*
+      Ensure to set 'omitCheckingCachedStatus' flag to true on getFile() call if running in Editor Preview to avoid unnecessary HEAD requests
+      This is because we append 'time-created' value from metadata in the file url to ensure we get the latest version of file,
+      as well as we check 'exists' in metadata to ensure to filter out a deleted file(s) upon start/reset
+     */
+    const omitCheckingCachedStatus = RisePlayerConfiguration.Helpers.isEditorPreview();
+
+    super.getFile( fileUrl, omitCheckingCachedStatus )
+      .then( objectUrl => {
+        if ( typeof objectUrl === "string" ) {
+          this._revokeObjectUrl();
+          this.$.image.src = objectUrl;
+        } else {
+          throw new Error( "Invalid file url!" );
+        }
+      }).catch( error => {
+        // TODO: handle error
+        console.error( error );
+      })
+  }
+
   _renderImage( filePath, fileUrl ) {
     if ( this.responsive ) {
       this.$.image.updateStyles({ "--iron-image-width": "100%", "width": "100%", "height": "auto", "display": "inline-block" });
@@ -241,6 +277,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;
       this.$.image.sizing = this.sizing;
       this.$.image.position = this.position;
+    }
+
+    if ( RisePlayerConfiguration.isPreview() ) {
+      return this._renderImageForPreview( fileUrl );
     }
 
     if ( super.getStorageFileFormat( filePath ) === "svg" ) {
@@ -284,6 +324,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this._renderImage( fileToRender.filePath, fileToRender.fileUrl );
       this._startTransitionTimer();
     } else {
+      if ( this._filesToRenderList.length === 1 ) {
+        // single image, no need to run _configureShowingImages, just run transition timer
+        return this._startTransitionTimer();
+      }
+
       this._configureShowingImages();
     }
   }
@@ -342,7 +387,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       }
     }
 
-    const { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
+    let { validFiles } = super.validateFiles( filesList, VALID_FILE_TYPES );
+
+    if ( RisePlayerConfiguration.isPreview() ) {
+      validFiles = this._filterDeletedFilesForPreview( validFiles );
+    }
 
     if ( !validFiles || !validFiles.length ) {
       this._validFiles = [];
@@ -364,6 +413,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _stop() {
+    this._revokeObjectUrl();
+
     this._validFiles = [];
     this._filesToRenderList = [];
 
@@ -389,6 +440,14 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     return entry && entry.exists ? "current" : "deleted";
   }
 
+  _filterDeletedFilesForPreview( files ) {
+    if ( !files || !Array.isArray( files ) ) {
+      return [];
+    }
+
+    return files.filter( file => this._previewStatusFor( file ) !== "deleted" );
+  }
+
   _timeCreatedFor( file ) {
     if ( !this._hasMetadata()) {
       return "";
@@ -403,7 +462,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._validFiles.forEach( file => super.handleFileStatusUpdated({
       filePath: file,
       fileUrl: this._getFileUrl( file ),
-      status: this._previewStatusFor( file )
+      status: "current"
     }));
   }
 
@@ -425,10 +484,9 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
   _encodePath( filePath ) {
     // encode each element of the path separatly
-
     let encodedPath = filePath.split("/")
-    .map( pathElement => encodeURIComponent( pathElement ))
-    .join("/");
+      .map( pathElement => encodeURIComponent( pathElement ))
+      .join("/");
 
     return encodedPath;
   }
@@ -443,9 +501,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   watchedFileAddedCallback() {
+    if ( RisePlayerConfiguration.isPreview() && this.managedFiles.length !== this._validFiles.length ) {
+      // For preview we wait until watchFilesMixin is managing full list of valid files
+      return;
+    }
+
     this._configureShowingImages();
   }
-
 
   watchedFileDeletedCallback( details ) {
     const { filePath } = details;
