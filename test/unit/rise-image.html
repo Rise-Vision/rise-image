@@ -184,8 +184,6 @@
           } );
 
           test( "should reset internals, clear displayed image, and call _start() only if not initial start", () => {
-            sinon.spy( element, "_clearDisplayedImage" );
-
             element._initialStart = false;
             element._watchInitiated = true;
             element._validFiles = [ SAMPLE_PATH ];
@@ -203,7 +201,6 @@
             assert.isEmpty( element._filesToRenderList );
             assert.isNull( element._transitionTimer );
             assert.equal( element._transitionIndex, 0 );
-            assert.isTrue( element._clearDisplayedImage.called );
             assert.isTrue( element._start.calledOnce );
           } );
 
@@ -458,6 +455,7 @@
 
             setup( () => {
               sandbox.stub(element, '_startEmptyPlayUntilDoneTimer');
+              sandbox.stub(element, '_clearDisplayedImage');
               sandbox.stub(element.__proto__.__proto__, 'log');
             });
 
@@ -472,6 +470,7 @@
 
               element._start();
 
+              assert.isTrue( element._clearDisplayedImage.called );
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
 
@@ -482,6 +481,7 @@
 
               element._start();
 
+              assert.isTrue( element._clearDisplayedImage.called );
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
 
@@ -493,6 +493,7 @@
 
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
 
+              assert.isTrue( element._clearDisplayedImage.called );
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
 
@@ -505,6 +506,7 @@
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
               element._handleSingleFileError({filePath: SAMPLE_PATH2, status: "NOEXIST"});
 
+              assert.isTrue( element._clearDisplayedImage.called );
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
 
@@ -516,6 +518,7 @@
 
               element._handleSingleFileError({filePath: SAMPLE_PATH, status: "NOEXIST"});
 
+              assert.isTrue( element._clearDisplayedImage.called );
               assert.isTrue( element._startEmptyPlayUntilDoneTimer.called );
             });
 
