@@ -106,9 +106,14 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   ready() {
     super.ready();
     this._configureImageEventListeners();
+  }
 
-    this.addEventListener( "rise-presentation-play", () => this._reset());
-    this.addEventListener( "rise-presentation-stop", () => this._stop());
+  _handleRisePresentationPlay() {
+    this._reset();
+  }
+
+  _handleRisePresentationStop() {
+    this._stop();
   }
 
   _configureImageEventListeners() {
@@ -347,6 +352,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     if ( !validFiles || !validFiles.length ) {
       this._validFiles = [];
 
+      this._clearDisplayedImage();
+
       return this._startEmptyPlayUntilDoneTimer();
     } else {
       this._validFiles = validFiles;
@@ -368,7 +375,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._filesToRenderList = [];
 
     super.stopWatch();
-    this._clearDisplayedImage();
+
+    /* NOTE
+      No longer clearing the currently displayed image. This fixes a specific situation where there are multiple templates in a schedule that each use an image component for a background image and the user has applied the same image for each one. When we previously cleared the displayed image, this specific situation resulted in a split second visual flaw where the background css styling displayed and then the actual background image gets displayed. This would occur upon every transition of each template in the schedule.
+     */
 
     timeOut.cancel( this._transitionTimer );
     this._transitionTimer = null;
@@ -438,6 +448,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
     if ( !this._filesToRenderList.length ) {
       this._done();
+      this._clearDisplayedImage();
       this._startEmptyPlayUntilDoneTimer();
     }
   }
