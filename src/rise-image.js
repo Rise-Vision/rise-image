@@ -433,11 +433,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     let url = RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
 
     if (RisePlayerConfiguration.Helpers.getViewerType && RisePlayerConfiguration.Helpers.getViewerType()) {
-      url += "&type=" + RisePlayerConfiguration.Helpers.getViewerType();
+      url += "&viewerType=" + RisePlayerConfiguration.Helpers.getViewerType();
     }
 
     if (RisePlayerConfiguration.Helpers.getViewerEnv && RisePlayerConfiguration.Helpers.getViewerEnv()) {
-      url += "&env=" + RisePlayerConfiguration.Helpers.getViewerEnv();
+      url += "&viewerEnv=" + RisePlayerConfiguration.Helpers.getViewerEnv();
     }
 
     if (RisePlayerConfiguration.Helpers.getViewerId && RisePlayerConfiguration.Helpers.getViewerId()) {

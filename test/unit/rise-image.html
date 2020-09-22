@@ -282,7 +282,7 @@
             let filePath = "risemedialibrary-123/file.jpg";
             let fileUrl = element._getFileUrl( filePath );
 
-            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&type=test_type");
+            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&viewerType=test_type");
 
             stub.reset();
           } );
@@ -293,7 +293,7 @@
             let filePath = "risemedialibrary-123/file.jpg";
             let fileUrl = element._getFileUrl( filePath );
 
-            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&env=test_env");
+            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&viewerEnv=test_env");
 
             stub.reset();
           } );
