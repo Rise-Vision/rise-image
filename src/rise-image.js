@@ -430,7 +430,21 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   }
 
   _getFileUrl( file ) {
-    return RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
+    let url = RiseImage.STORAGE_PREFIX + this._encodePath( file ) + "?_=" + this._timeCreatedFor( file );
+
+    if (RisePlayerConfiguration.Helpers.getViewerType && RisePlayerConfiguration.Helpers.getViewerType()) {
+      url += "&type=" + RisePlayerConfiguration.Helpers.getViewerType();
+    }
+
+    if (RisePlayerConfiguration.Helpers.getViewerEnv && RisePlayerConfiguration.Helpers.getViewerEnv()) {
+      url += "&env=" + RisePlayerConfiguration.Helpers.getViewerEnv();
+    }
+
+    if (RisePlayerConfiguration.Helpers.getViewerId && RisePlayerConfiguration.Helpers.getViewerId()) {
+      url += "&viewerId=" + RisePlayerConfiguration.Helpers.getViewerId();
+    }
+
+    return url;
   }
 
   _encodePath( filePath ) {
