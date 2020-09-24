@@ -24,6 +24,11 @@
         },
         LocalStorage: {
           watchSingleFile: () => {}
+        },
+        Helpers: {
+          getViewerType: () => {},
+          getViewerEnv: () => {},
+          getViewerId: () => {}
         }
       };
     </script>
@@ -271,6 +276,41 @@
             } );
           } );
 
+          test( "should add 'type' parameter", () => {
+            var stub = sinon.stub( RisePlayerConfiguration.Helpers, "getViewerType" ).returns( "test_type" );
+
+            let filePath = "risemedialibrary-123/file.jpg";
+            let fileUrl = element._getFileUrl( filePath );
+
+            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&viewerType=test_type");
+
+            stub.reset();
+          } );
+
+          test( "should add 'env' parameter", () => {
+            var stub = sinon.stub( RisePlayerConfiguration.Helpers, "getViewerEnv" ).returns( "test_env" );
+
+            let filePath = "risemedialibrary-123/file.jpg";
+            let fileUrl = element._getFileUrl( filePath );
+
+            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&viewerEnv=test_env");
+
+            stub.reset();
+          } );
+
+          test( "should add 'viewerId' parameter", () => {
+            var stub = sinon.stub( RisePlayerConfiguration.Helpers, "getViewerId" ).returns( "test_viewerId" );
+
+            let filePath = "risemedialibrary-123/file.jpg";
+            let fileUrl = element._getFileUrl( filePath );
+
+            assert.equal(fileUrl, "https://storage.googleapis.com/risemedialibrary-123/file.jpg?_=&viewerId=test_viewerId");
+
+            stub.reset();
+          } );
+
+
+          
         } );
 
         suite( "_handleStartForPreview", () => {
