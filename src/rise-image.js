@@ -138,6 +138,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
         storage: super.getStorageData( filePath, fileUrl )
       });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
+
+      this._onShowImageComplete();
     });
 
     this.$.image.addEventListener( "loaded-changed", event => {
