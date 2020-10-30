@@ -139,6 +139,8 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
 
+      timeOut.cancel( this._transitionTimer );
+      this._transitionTimer = null;
       this._onShowImageComplete();
     });
 
