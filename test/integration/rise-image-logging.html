@@ -240,15 +240,13 @@
         setTimeout( () => {
             assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
             assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "image-svg-fail");
-            assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], "Request failed: 404: Not found");
-            assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
-                storage: {
-                    configuration: "storage file",
-                    file_form: "svg",
-                    file_path: filePath,
-                    local_url: `https://storage.googleapis.com/${filePath}`
-                }
-            } );
+            assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ].error, "Request failed: 404: Not found");
+            assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ].storage, {
+                configuration: "storage file",
+                file_form: "svg",
+                file_path: filePath,
+                local_url: `https://storage.googleapis.com/${filePath}`
+            });
 
             element._getDataUrlFromSVGLocalUrl.restore();
 
@@ -263,7 +261,7 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "image-load-fail");
-        assert.isNull( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ] );
+        assert.isNotNull( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ].errorCode );
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
             storage: {
                 configuration: "storage file",
