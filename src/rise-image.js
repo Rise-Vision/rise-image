@@ -182,7 +182,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
       this._stop();
 
-      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, {
+      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_IMAGE_RESET, null, {
         files: filesToLog, isLogo: this.isLogo, logoFile: this.logoFile
       });
       this._start();
@@ -220,10 +220,13 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
             reject( "Read failed" );
           }
 
-          super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, { svg_details: {
-            blob_size: xhr.response.size,
-            data_url_length: reader.result.length
-          } }, { storage: super.getStorageData( file, localUrl ) });
+          super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, null, { 
+            svg_details: {
+              blob_size: xhr.response.size,
+              data_url_length: reader.result.length
+            }, 
+            storage: super.getStorageData( file, localUrl )
+          });
 
           resolve( reader.result );
         };
@@ -426,7 +429,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     if ( this._initialStart ) {
       this._initialStart = false;
 
-      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, {
+      super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_START, null, {
         files: this.files, isLogo: this.isLogo, logoFile: this.logoFile
       });
 

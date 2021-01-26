@@ -81,7 +81,8 @@
 
       assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 0 ], componentData );
       assert.equal( RisePlayerConfiguration.Logger.info.args[ 0 ][ 1 ], "start");
-      assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], { files: SAMPLE_PATH, isLogo: false, logoFile: "" } );
+      assert.equal( RisePlayerConfiguration.Logger.info.args[ 0 ][ 2 ], null);
+      assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 0 ][ 3 ], { files: SAMPLE_PATH, isLogo: false, logoFile: "" } );
     });
 
     test( "should log an 'file-rls-error' event when FILE-ERROR is received", () => {
@@ -186,7 +187,8 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.info.args[ 1 ][ 1 ], "image-reset");
-        assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ], { files: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png", isLogo: false, logoFile: "" } );
+        assert.equal( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ], null);
+        assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 3 ], { files: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo2.png", isLogo: false, logoFile: "" } );
 
         element._start.restore();
     } );
@@ -206,15 +208,14 @@
           setTimeout(() => {
               assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 0 ], componentData );
               assert.equal( RisePlayerConfiguration.Logger.info.args[ 1 ][ 1 ], "image-svg-usage");
-              assert.property( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ].svg_details, "blob_size");
-              assert.property( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ].svg_details, "data_url_length");
-              assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 3 ], {
-                  storage: {
-                      configuration: "storage file",
-                      file_form: "svg",
-                      file_path: filePath,
-                      local_url: `https://storage.googleapis.com/${filePath}`
-                  }
+              assert.equal( RisePlayerConfiguration.Logger.info.args[ 1 ][ 2 ], null);
+              assert.property( RisePlayerConfiguration.Logger.info.args[ 1 ][ 3 ].svg_details, "blob_size");
+              assert.property( RisePlayerConfiguration.Logger.info.args[ 1 ][ 3 ].svg_details, "data_url_length");
+              assert.deepEqual( RisePlayerConfiguration.Logger.info.args[ 1 ][ 3 ].storage, {
+                configuration: "storage file",
+                file_form: "svg",
+                file_path: filePath,
+                local_url: `https://storage.googleapis.com/${filePath}`
               } );
 
               done();
@@ -240,7 +241,11 @@
         setTimeout( () => {
             assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
             assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "image-svg-fail");
-            assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ].error, "Request failed: 404: Not found");
+            assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {
+                error: "Request failed: 404: Not found", 
+                errorCode: "E000000012"
+            });
+            // assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ].error, "Request failed: 404: Not found");
             assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ].storage, {
                 configuration: "storage file",
                 file_form: "svg",
