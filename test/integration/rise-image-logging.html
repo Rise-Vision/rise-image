@@ -102,13 +102,12 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-rls-error");
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {
-            errorMessage: "image download error",
-            errorDetail: "network failure"
-        });
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000041' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            errorMessage: "image download error",
+            errorDetail: "network failure",
             storage: storageData
-        } );
+        });
     });
 
     test( "should log an 'file-insufficient-disk-space-error' event when FILE-ERROR is received", () => {
@@ -128,13 +127,12 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-insufficient-disk-space-error");
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {
-            errorMessage: "Insufficient disk space",
-            errorDetail: "network failure"
-        });
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000040' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            errorMessage: "Insufficient disk space",
+            errorDetail: "network failure",
             storage: storageData
-        } );
+        });
     });
 
     test( "should log a 'file-not-found' warning when NOEXIST is received", () => {
@@ -154,7 +152,10 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 1 ], "file-not-found");
+        assert.equal( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 2 ], null);
         assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 3 ], {
+            errorMessage: undefined,
+            errorDetail: undefined,
             storage: storageData
         } );
     });
@@ -168,7 +169,7 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "format-invalid");
-        assert.isNull( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ]);
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000038' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
             storage: {
                 configuration: "storage file",
