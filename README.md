@@ -5,11 +5,10 @@
 `rise-image` is a Polymer 3 Web Component that retrieves image files from Rise Local Storage, and displays them.
 
 ## Usage for Designers
-### Integration in a Template
-
 The below illustrates simple usage of the component. An example of a working image component in a Template can be found here: 
 https://github.com/Rise-Vision/html-template-library/tree/master/example-pud-image
 
+### Integration in a Template
 #### HTML
 Add a reference to the component in the `<head>` section of **template.html**.
 ```
@@ -56,7 +55,7 @@ For npm to install dependencies neccesssary add refrences to component repo in *
 ```
 
 #### Build and Test Locally in Browswer 
-Execute the following commands in Terminal and preview template.html in browser.  example: http://localhost:8081/build/prod/src/template.html:
+Execute the following commands in Terminal and preview template.html in browser using a simple server.  example: http://localhost:8081/build/prod/src/template.html:
 
 ```
 npm install
