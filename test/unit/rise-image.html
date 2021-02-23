@@ -17,7 +17,6 @@
       const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
 
       RisePlayerConfiguration = {
-        isConfigured: () => true,
         isPreview: () => false,
         Branding: {
           watchLogoFile: () => {}
@@ -26,6 +25,7 @@
           watchSingleFile: () => {}
         },
         Helpers: {
+          getComponentAsync: () => {},
           getViewerType: () => {},
           getViewerEnv: () => {},
           getViewerId: () => {}

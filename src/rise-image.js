@@ -425,7 +425,9 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     }));
   }
 
-  _handleStart() {
+  _handleStart(event) {
+    super._handleStart( event );
+
     if ( this._initialStart ) {
       this._initialStart = false;
 

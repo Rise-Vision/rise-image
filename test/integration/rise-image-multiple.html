@@ -28,14 +28,15 @@
     ];
 
     RisePlayerConfiguration = {
-      isConfigured: () => true,
       isPreview: () => false,
       Logger: {
         info: () => {},
         error: () => {},
         warning: () => {}
       },
-      Helpers: {}
+      Helpers: {
+        getComponentAsync: () => {}
+      }
     };
 
     RisePlayerConfiguration.LocalMessaging = {

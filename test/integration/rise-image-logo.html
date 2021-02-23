@@ -19,7 +19,6 @@
 
     let brandingHandler;
     RisePlayerConfiguration = {
-      isConfigured: () => true,
       isPreview: () => false,
       Branding: {
         watchLogoFile: (handler) => {
@@ -33,7 +32,9 @@
         error: () => {},
         warning: () => {}
       },
-      Helpers: {}
+      Helpers: {
+        getComponentAsync: () => {}
+      }
     };
 
     RisePlayerConfiguration.LocalMessaging = {

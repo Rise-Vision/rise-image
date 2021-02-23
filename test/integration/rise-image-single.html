@@ -18,14 +18,15 @@
     const SAMPLE_URL2 = `https://storage.googleapis.com/${ SAMPLE_PATH2 }`;
 
     RisePlayerConfiguration = {
-      isConfigured: () => true,
       isPreview: () => false,
       Logger: {
         info: () => {},
         error: () => {},
         warning: () => {}
       },
-      Helpers: {}
+      Helpers: {
+        getComponentAsync: () => {}
+      }
     };
   </script>
   <script src="../../src/rise-image.js" type="module"></script>
