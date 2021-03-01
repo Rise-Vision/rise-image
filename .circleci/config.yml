@@ -71,16 +71,6 @@ jobs:
           paths:
             - gcloud
 
-  generate-version:
-    docker: *BUILDIMAGE
-    steps:
-      - run: mkdir version-string
-      - run: echo $(date +%Y.%m.%d.%H.%M) > version-string/version
-      - persist_to_workspace:
-          root: .
-          paths:
-            - version-string
-
   build-e2e-page:
     parameters:
       stage:
@@ -94,7 +84,7 @@ jobs:
           key: node-cache-{{ checksum "package.json" }}
       - run: echo build e2e page << parameters.stage >>
       - run: |
-          VERSION=$(cat version-string/version)
+          VERSION=$(echo -n $CIRCLE_BRANCH |awk 'BEGIN{FS="/"}{print tolower($NF)}')
           sed "
             s/__STAGE__/<< parameters.stage >>/;
             s/__VERSION__/$VERSION/;
@@ -117,7 +107,7 @@ jobs:
       - run: mkdir -p ~/.config
       - run: cp -r gcloud ~/.config
       - run: |
-          VERSION=$(cat version-string/version)
+          VERSION=$(echo -n $CIRCLE_BRANCH |awk 'BEGIN{FS="/"}{print tolower($NF)}')
           TARGET=$WIDGETS_BASE/staging/components/$COMPONENT_NAME/$VERSION/
           echo Deploying version $VERSION to $COMPONENT_NAME
           node_modules/rise-common-component/scripts/deploy-gcs.sh $COMPONENT_NAME $TARGET
@@ -225,23 +215,12 @@ workflows:
                 - /^e2e[/].*/
                 - master
                 - build/stable
-      - generate-version:
-          requires:
-            - preconditions
-          filters:
-            branches:
-              only:
-                - /^(stage|staging)[/].*/
-                - /^e2e[/].*/
-                - master
-                - build/stable
       - test:
           requires:
             - install
       - build:
           requires:
             - test
-            - generate-version
           filters:
             branches:
               only:
