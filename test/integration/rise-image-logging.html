@@ -16,15 +16,16 @@
         const SAMPLE_URL = `https://storage.googleapis.com/${ SAMPLE_PATH }`;
 
         RisePlayerConfiguration = {
-          isConfigured: () => true,
-          isPreview: () => false
+          isPreview: () => false,
+          Helpers: {
+            getComponentAsync: () => {}
+          }
         };
 
         RisePlayerConfiguration.LocalMessaging = {
           isConnected: () => { return true; }
         }
     </script>
-    <script src="../../src/rise-image.js" type="module"></script>
 </head>
 <body>
 <test-fixture id="test-block">
@@ -40,7 +41,10 @@
     </template>
 </test-fixture>
 
-<script>
+<script type="module">
+  import { RiseElement } from "rise-common-component/src/rise-element.js";
+  import RiseImage from "../src/rise-image.js";
+
   suite( "logging", () => {
     const componentData = {
         name: "rise-image",
@@ -70,10 +74,14 @@
       };
 
       element = fixture( "test-block" );
+
+      sinon.stub(RiseElement.prototype, "_handleStart");
     });
 
     teardown(() => {
-        RisePlayerConfiguration.Logger = {};
+      RisePlayerConfiguration.Logger = {};
+
+      RiseElement.prototype._handleStart.restore();
     });
 
     test( "should log 'start' event with correct params", () => {
