@@ -59,7 +59,7 @@ This component receives the following list of attributes:
 - **files** ( string / required ): List of image file paths separated by pipe symbol. A file path must be a valid GCS file path. A folder path will not be valid. For example, this is a default folder path from Rise Storage:
 https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/Template%20Library/Global%20Assets/logo-white.png.
 To create a valid GCS path, remove *https://storage.googleapis.com/* and replace *%20* with a space.
-The resulting GCS path is: risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/Template Library/Global Assets/logo-white.png.
+The resulting GCS path is: risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/Template Library/Global Assets/logo-white.png. Image files must also be any of the following supported formats: JPG, JPEG, PNG, BMP, SVG, GIF, WEBP
 - **duration**: ( number ): The duration in seconds that each image shows for when multiple files are configured. Defaults to 10 seconds.
 - **width**: ( number / required ): Sets the width of image(s). Required if not using _responsive_ attribute.
 - **height**: ( number / required ): Sets the height of image(s). Required if not using _responsive_ attribute.
