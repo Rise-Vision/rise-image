@@ -132,9 +132,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       }
 
       const filePath = this._filesToRenderList[ this._transitionIndex ].filePath,
-        fileUrl = this._filesToRenderList[ this._transitionIndex ].fileUrl;
+        fileUrl = this._filesToRenderList[ this._transitionIndex ].fileUrl,
+        errorCode = fileUrl && fileUrl.startsWith(RiseImage.STORAGE_PREFIX) ? "E000000011" : "E000000200";
 
-      super.log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", {errorCode: "E000000011"}, {
+      super.log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", {errorCode}, {
         storage: super.getStorageData( filePath, fileUrl )
       });
       this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
@@ -220,11 +221,11 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
             reject( "Read failed" );
           }
 
-          super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, null, { 
+          super.log( RiseImage.LOG_TYPE_INFO, RiseImage.EVENT_SVG_USAGE, null, {
             svg_details: {
               blob_size: xhr.response.size,
               data_url_length: reader.result.length
-            }, 
+            },
             storage: super.getStorageData( file, localUrl )
           });
 
