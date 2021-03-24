@@ -195,11 +195,15 @@
         element._setLogoFile("risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt");
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.equal( RisePlayerConfiguration.Logger.error.lastCall.args[1], "all-formats-invalid" );
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.lastCall.args[2], { errorCode: 'E000000039' });
+        assert.equal( RisePlayerConfiguration.Logger.error.lastCall.args[1], "format-invalid" );
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.lastCall.args[2], { errorCode: 'E000000038' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.lastCall.args[3], {
-          files: [ "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt" ],
-          errorMessage: "All file formats are invalid"
+          storage: {
+            configuration: "storage file",
+            file_form: "txt",
+            file_path: "risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/test.txt",
+            local_url: ""
+          }
         });
       });
 

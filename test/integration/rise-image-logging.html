@@ -26,6 +26,7 @@
           isConnected: () => { return true; }
         }
     </script>
+    <script src="../../src/rise-image.js" type="module"></script>
 </head>
 <body>
 <test-fixture id="test-block">
@@ -43,7 +44,6 @@
 
 <script type="module">
   import { RiseElement } from "rise-common-component/src/rise-element.js";
-  import RiseImage from "../src/rise-image.js";
 
   suite( "logging", () => {
     const componentData = {
@@ -110,7 +110,7 @@
 
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-rls-error");
-        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000041' });
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000027' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
             errorMessage: "image download error",
             errorDetail: "network failure",
@@ -143,7 +143,7 @@
         });
     });
 
-    test( "should log a 'file-not-found' warning when NOEXIST is received", () => {
+    test( "should log a 'file-not-found' event when NOEXIST is received", () => {
       RisePlayerConfiguration.LocalStorage.watchSingleFile = ( file, handler ) => {
           handler({
               filePath: SAMPLE_PATH,
@@ -158,10 +158,12 @@
 
         assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
 
-        assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 0 ], componentData );
-        assert.equal( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 1 ], "file-not-found");
-        assert.equal( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 2 ], null);
-        assert.deepEqual( RisePlayerConfiguration.Logger.warning.args[ 0 ][ 3 ], {
+        console.log(RisePlayerConfiguration.Logger.error.args);
+
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
+        assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-not-found");
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {errorCode: "E000000014"});
+        assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
             errorMessage: undefined,
             errorDetail: undefined,
             storage: storageData
@@ -251,7 +253,7 @@
             assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
             assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "image-svg-fail");
             assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {
-                error: "Request failed: 404: Not found", 
+                error: "Request failed: 404: Not found",
                 errorCode: "E000000012"
             });
             // assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ].error, "Request failed: 404: Not found");
