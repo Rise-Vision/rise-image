@@ -101,6 +101,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._initialStart = true;
     this._transitionIndex = 0;
     this._transitionTimer = null;
+    this._watchType = null;
   }
 
   ready() {
@@ -256,7 +257,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this.$.image.position = this.position;
     }
 
-    if ( super.getStorageFileFormat( filePath ) === "svg" ) {
+    if ( this._watchType === RiseImage.WATCH_TYPE_RLS && super.getStorageFileFormat( filePath ) === "svg" ) {
       this._getDataUrlFromSVGLocalUrl( filePath, fileUrl )
         .then( dataUrl => {
           this.$.image.src = dataUrl;
@@ -367,15 +368,16 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     } else {
       this._validFiles = validFiles;
 
-      if ( RisePlayerConfiguration.isPreview()) {
+      // account for the component running in editor preview OR running locally in browser
+      if ( RisePlayerConfiguration.Helpers.isEditorPreview() || !RisePlayerConfiguration.Helpers.isInViewer()) {
         return this._handleStartForPreview();
       }
 
-      if ( !RisePlayerConfiguration.LocalMessaging.isConnected()) {
-        return this._startEmptyPlayUntilDoneTimer();
-      }
-
-      super.startWatch( validFiles );
+      super.startWatch( validFiles )
+        .then((watchType) => {
+          this._watchType = watchType;
+        })
+        .catch(() => this._startEmptyPlayUntilDoneTimer());
     }
   }
 
@@ -384,6 +386,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._filesToRenderList = [];
 
     super.stopWatch();
+    this._watchType = null;
 
     /* NOTE
       No longer clearing the currently displayed image. This fixes a specific situation where there are multiple templates in a schedule that each use an image component for a background image and the user has applied the same image for each one. When we previously cleared the displayed image, this specific situation resulted in a split second visual flaw where the background css styling displayed and then the actual background image gets displayed. This would occur upon every transition of each template in the schedule.

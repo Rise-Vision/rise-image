@@ -1,6 +1,6 @@
 {
   "name": "rise-image",
-  "version": "1.1.17",
+  "version": "1.2.0",
   "description": "Web component built for Templates to display an image from Storage",
   "repository": "https://github.com/Rise-vision/rise-image.git",
   "bugs": {
@@ -18,7 +18,7 @@
     "pretty": "eslint . --fix"
   },
   "dependencies": {
-    "rise-common-component": "git://github.com/Rise-Vision/rise-common-component.git#v1.9.4",
+    "rise-common-component": "git://github.com/Rise-Vision/rise-common-component.git#8231987d",
     "@polymer/iron-image": "^3.0.1"
   },
   "devDependencies": {},
