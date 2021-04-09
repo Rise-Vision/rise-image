@@ -18,13 +18,17 @@
         RisePlayerConfiguration = {
           isPreview: () => false,
           Helpers: {
-            getComponentAsync: () => {}
-          }
+              getComponentAsync: () => {
+              },
+              isEditorPreview: () => {return false;},
+              isInViewer: () => {return true;},
+              useContentSentinel: () => {return false;},
+              isDisplay: () => {return true;}
+          },
+            LocalMessaging: {
+              isConnected: () => {return true;}
+            }
         };
-
-        RisePlayerConfiguration.LocalMessaging = {
-          isConnected: () => { return true; }
-        }
     </script>
     <script src="../../src/rise-image.js" type="module"></script>
 </head>

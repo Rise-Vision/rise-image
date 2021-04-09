@@ -25,7 +25,11 @@
         warning: () => {}
       },
       Helpers: {
-        getComponentAsync: () => {}
+        getComponentAsync: () => {},
+        isEditorPreview: () => {return false;},
+        isInViewer: () => {return true;},
+        useContentSentinel: () => {return false;},
+        isDisplay: () => {return true;}
       }
     };
   </script>
@@ -136,16 +140,17 @@
         spy.restore();
       });
 
-      test('it should not watch files when LM is not connected', () => {
-        sinon.spy( element, "startWatch" );
+      test('it should not watch files when LM is not connected', (done) => {
         sinon.spy( element, "_startEmptyPlayUntilDoneTimer" );
 
         RisePlayerConfiguration.LocalMessaging.isConnected = () => { return false; };
 
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.isFalse(element.startWatch.called);
-        assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
+        setTimeout(()=>{
+          assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
+          done();
+        }, 200);
       });
 
     });
@@ -194,18 +199,21 @@
         const svgFilePath = "risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/PokemonGO-Team-Logos-Instinct.svg",
           svgFileUrl = `https://storage.googleapis.com/${svgFilePath}`;
 
-        sinon.stub(element, "_getDataUrlFromSVGLocalUrl").callsFake(() => {
-          return Promise.reject("Request failed: 404: Not found");
-        });
-
-        element.addEventListener('image-error', event => {
+        const handler = event => {
           assert.deepEqual( event.detail, {
             filePath: svgFilePath,
             errorMessage: "Request failed: 404: Not found"
           });
 
+          element.removeEventListener('image-error', handler);
           done();
+        }
+
+        sinon.stub(element, "_getDataUrlFromSVGLocalUrl").callsFake(() => {
+          return Promise.reject("Request failed: 404: Not found");
         });
+
+        element.addEventListener('image-error', handler);
 
         RisePlayerConfiguration.LocalStorage = {
           watchSingleFile: ( file, handler ) => {
@@ -221,11 +229,13 @@
 
     suite('running on preview or directly in browser', () => {
       setup(() => {
-        RisePlayerConfiguration.isPreview = () => true;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => true;
+        RisePlayerConfiguration.Helpers.isInViewer = () => false;
       });
 
       teardown(() => {
-        RisePlayerConfiguration.isPreview = () => false;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => false;
+        RisePlayerConfiguration.Helpers.isInViewer = () => true;
       });
 
       test('it should render image with a cache bumper parameter', () => {
