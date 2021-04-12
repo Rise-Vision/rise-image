@@ -258,6 +258,13 @@
 
             assert.isTrue( element._getDataUrlFromSVGLocalUrl.called );
           } );
+
+          test( "should apply prefix to file url when watch type is Content Sentinel", () => {
+            element._watchType = "rise-content-sentinel";
+            element._renderImage( SAMPLE_PATH, SAMPLE_PATH );
+
+            assert.equal(element.$.image.src, `https://widgets.risevision.com/${SAMPLE_PATH}`);
+          } );
         } );
 
         suite( "_getFileUrl", () => {

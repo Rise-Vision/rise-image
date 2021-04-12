@@ -270,7 +270,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
           this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: error });
         });
     } else {
-      this.$.image.src = fileUrl;
+      this.$.image.src = this._watchType === RiseImage.WATCH_TYPE_SENTINEL ? `https://widgets.risevision.com/${fileUrl}` : fileUrl;
     }
   }
 
