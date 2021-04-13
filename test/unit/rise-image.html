@@ -28,7 +28,9 @@
           getComponentAsync: () => {},
           getViewerType: () => {},
           getViewerEnv: () => {},
-          getViewerId: () => {}
+          getViewerId: () => {},
+          isEditorPreview: () => {},
+          isInViewer: () => {}
         }
       };
     </script>
@@ -250,7 +252,8 @@
 
           } );
 
-          test( "should attempt to get data url when format is SVG", () => {
+          test( "should attempt to get data url when format is SVG and watch type is RLS", () => {
+            element._watchType = "rise-local-storage";
             element._renderImage( "risemedialibrary-abc123/test.svg", "https://storage.googleapis.com/risemedialibrary-abc123/test.svg" );
 
             assert.isTrue( element._getDataUrlFromSVGLocalUrl.called );
@@ -310,7 +313,7 @@
           } );
 
 
-          
+
         } );
 
         suite( "_handleStartForPreview", () => {

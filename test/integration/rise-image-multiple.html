@@ -35,7 +35,11 @@
         warning: () => {}
       },
       Helpers: {
-        getComponentAsync: () => {}
+        getComponentAsync: () => {},
+        isEditorPreview: () => {return false;},
+        isInViewer: () => {return true;},
+        useContentSentinel: () => {return false;},
+        isDisplay: () => {return true;}
       }
     };
 
@@ -329,11 +333,13 @@
 
     suite('running on preview or directly in browser', () => {
       setup(() => {
-        RisePlayerConfiguration.isPreview = () => true;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => true;
+        RisePlayerConfiguration.Helpers.isInViewer = () => false;
       });
 
       teardown(() => {
-        RisePlayerConfiguration.isPreview = () => false;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => false;
+        RisePlayerConfiguration.Helpers.isInViewer = () => true;
       });
 
       test('it should render first image', () => {

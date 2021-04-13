@@ -33,7 +33,11 @@
         warning: () => {}
       },
       Helpers: {
-        getComponentAsync: () => {}
+        getComponentAsync: () => {},
+        isEditorPreview: () => {return false;},
+        isInViewer: () => {return true;},
+        useContentSentinel: () => {return false;},
+        isDisplay: () => {return true;}
       }
     };
 
@@ -146,7 +150,7 @@
         spy.restore();
       });
 
-      test('it should not watch logo file when LM is not connected', () => {
+      test('it should not watch logo file when LM is not connected', (done) => {
         sinon.spy( element, "startWatch" );
         sinon.spy( element, "_startEmptyPlayUntilDoneTimer" );
 
@@ -154,10 +158,13 @@
 
         element.dispatchEvent( new CustomEvent( "start" ) );
 
-        assert.isFalse(element.startWatch.called);
-        assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
+        setTimeout(() => {
+          assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
 
-        RisePlayerConfiguration.LocalMessaging.isConnected = () => { return true; };
+          RisePlayerConfiguration.LocalMessaging.isConnected = () => { return true; };
+
+          done();
+        }, 200);
       });
 
     });
@@ -238,11 +245,13 @@
 
     suite('running on preview or directly in browser', () => {
       setup(() => {
-        RisePlayerConfiguration.isPreview = () => true;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => true;
+        RisePlayerConfiguration.Helpers.isInViewer = () => false;
       });
 
       teardown(() => {
-        RisePlayerConfiguration.isPreview = () => false;
+        RisePlayerConfiguration.Helpers.isEditorPreview = () => false;
+        RisePlayerConfiguration.Helpers.isInViewer = () => true;
       });
 
       test('it should render image with a cache bumper parameter', () => {
