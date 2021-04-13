@@ -377,7 +377,15 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
         .then((watchType) => {
           this._watchType = watchType;
         })
-        .catch(() => this._startEmptyPlayUntilDoneTimer());
+        .catch(() => {
+          if ( RisePlayerConfiguration.Helpers.isDisplay() ) {
+            // Account for a Player local messaging connection problem (RLS)
+            return this._startEmptyPlayUntilDoneTimer();
+          }
+
+          // Special handling for schools applying Browser policy that disables SW feature in Browser (Content Sentinel)
+          this._handleStartForPreview();
+        });
     }
   }
 
