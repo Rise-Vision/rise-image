@@ -18,7 +18,7 @@
     "pretty": "eslint . --fix"
   },
   "dependencies": {
-    "rise-common-component": "git://github.com/Rise-Vision/rise-common-component.git#v1.10.0",
+    "rise-common-component": "git://github.com/Rise-Vision/rise-common-component.git#4a52ab",
     "@polymer/iron-image": "^3.0.1"
   },
   "devDependencies": {},
