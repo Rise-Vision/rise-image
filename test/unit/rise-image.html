@@ -589,6 +589,37 @@
             });
           });
 
+          suite( "_handleFirstDownloadTimer()", () => {
+            const sandbox = sinon.createSandbox();
+
+            setup( () => {
+              sandbox.stub(window, 'clearTimeout');
+              sandbox.stub(window, 'setTimeout');
+              sandbox.stub(element.__proto__.__proto__, '_sendDoneEvent');
+            });
+
+            teardown( () => {
+              sandbox.restore();
+            });
+
+            test( "should call _done() when first download timer fires, if no files have been downloaded", () => {
+              element.setAttribute( "play-until-done", true);
+
+              element.managedFiles = [];
+              element._handleFirstDownloadTimer();
+
+              assert.equal( element._sendDoneEvent.callCount, 1 );
+            } );
+
+            test( "should not call _done() when first download timer fires, if some files have been downloaded", () => {
+              sandbox.spy( element, '_done' );
+
+              element.managedFiles = ["a", "b", "c"];
+              element._handleFirstDownloadTimer();
+
+              assert.equal( element._sendDoneEvent.callCount, 0 );
+            } );
+          } );
         });
 
         suite( "branding", () => {

@@ -9,6 +9,7 @@ import { version } from "./rise-image-version.js";
 import "@polymer/iron-image/iron-image.js";
 
 export const VALID_FILE_TYPES = [ "jpg", "jpeg", "png", "bmp", "svg", "gif", "webp" ];
+export const MAXIMUM_TIME_FOR_FIRST_DOWNLOAD = 5 * 1000;
 
 class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   static get template() {
@@ -102,6 +103,10 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._transitionIndex = 0;
     this._transitionTimer = null;
     this._watchType = null;
+    this._firstDownloadTimer = null;
+    this._maximumTimeForFirstDownload = MAXIMUM_TIME_FOR_FIRST_DOWNLOAD;
+
+    this._handleFirstDownloadTimer = this._handleFirstDownloadTimer.bind( this );
   }
 
   ready() {
@@ -331,6 +336,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     if ( this._filesToRenderList.length > 0 ) {
       const fileToRender = this._filesToRenderList[ this._transitionIndex ];
 
+      this._clearFirstDownloadTimer();
       this._renderImage( fileToRender.filePath, fileToRender.fileUrl );
 
       this._startTransitionTimer();
@@ -344,6 +350,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     let filesList;
 
     super.stopWatch();
+    this._clearFirstDownloadTimer();
 
     if ( !this.logoFile && this._hasMetadata()) {
       filesList = this._getFilesFromMetadata();
@@ -376,6 +383,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       super.startWatch( validFiles )
         .then((watchType) => {
           this._watchType = watchType;
+          this._waitForFirstDownload();
         })
         .catch(() => {
           if ( RisePlayerConfiguration.Helpers.isDisplay() ) {
@@ -394,6 +402,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._filesToRenderList = [];
 
     super.stopWatch();
+    this._clearFirstDownloadTimer();
     this._watchType = null;
 
     /* NOTE
@@ -493,7 +502,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     this._configureShowingImages();
   }
 
-
   watchedFileDeletedCallback( details ) {
     const { filePath } = details;
 
@@ -505,6 +513,25 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
   _filePathIsRendered( filePath ) {
     return this._filesToRenderList.find( file => file.filePath === filePath );
+  }
+
+  _clearFirstDownloadTimer() {
+    if ( this._firstDownloadTimer ) {
+      clearTimeout( this._firstDownloadTimer );
+      this._firstDownloadTimer = null;
+    }
+  }
+
+  _waitForFirstDownload() {
+    this._clearFirstDownloadTimer();
+
+    this._firstDownloadTimer = setTimeout( this._handleFirstDownloadTimer, this._maximumTimeForFirstDownload );
+  }
+
+  _handleFirstDownloadTimer() {
+    if ( !this.managedFiles.length && this.hasAttribute( "play-until-done" ) ) {
+      super._sendDoneEvent( true );
+    }
   }
 
   _sendImageEvent( eventName, detail = {}) {
