@@ -71,6 +71,12 @@
         }
       };
 
+        RisePlayerConfiguration.ContentSentinel = {
+            watchSingleFile: ( file, handler ) => {
+                handler({ status: "CURRENT", filePath: SAMPLE_PATH, fileUrl: SAMPLE_URL });
+            }
+        };
+
       RisePlayerConfiguration.Logger = {
         info: sinon.spy(),
         error: sinon.spy(),
@@ -116,11 +122,41 @@
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-rls-error");
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000027' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            watchType: "rise-local-storage",
             errorMessage: "image download error",
             errorDetail: "network failure",
             storage: storageData
         });
     });
+
+    test( "should log an 'file-content-sentinel-error' event when FILE-ERROR is received", () => {
+        RisePlayerConfiguration.Helpers.useContentSentinel = () => {return true};
+        RisePlayerConfiguration.ContentSentinel.watchSingleFile = ( file, handler ) => {
+              handler({
+                  filePath: SAMPLE_PATH,
+                  fileUrl: null,
+                  status: "FILE-ERROR",
+                  errorMessage: "image download error",
+                  errorDetail: "network failure"
+              });
+          };
+
+          element.dispatchEvent( new CustomEvent( "start" ) );
+
+          assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
+
+          assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
+          assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-content-sentinel-error");
+          assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000215' });
+          assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+              watchType: "rise-content-sentinel",
+              errorMessage: "image download error",
+              errorDetail: "network failure",
+              storage: storageData
+          });
+
+        RisePlayerConfiguration.Helpers.useContentSentinel = () => {return false};
+      });
 
     test( "should log an 'file-insufficient-disk-space-error' event when FILE-ERROR is received", () => {
       RisePlayerConfiguration.LocalStorage.watchSingleFile = ( file, handler ) => {
@@ -141,6 +177,7 @@
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-insufficient-disk-space-error");
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], { errorCode: 'E000000040' });
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            watchType: "rise-local-storage",
             errorMessage: "Insufficient disk space",
             errorDetail: "network failure",
             storage: storageData
@@ -162,12 +199,11 @@
 
         assert.equal( RisePlayerConfiguration.Logger.info.callCount, 1 ); // start
 
-        console.log(RisePlayerConfiguration.Logger.error.args);
-
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 0 ], componentData );
         assert.equal( RisePlayerConfiguration.Logger.error.args[ 0 ][ 1 ], "file-not-found");
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 2 ], {errorCode: "E000000014"});
         assert.deepEqual( RisePlayerConfiguration.Logger.error.args[ 0 ][ 3 ], {
+            watchType: "rise-local-storage",
             errorMessage: undefined,
             errorDetail: undefined,
             storage: storageData
