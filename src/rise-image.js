@@ -256,8 +256,16 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       this.$.image.updateStyles({ "--iron-image-width": "100%", "width": "100%", "height": "auto", "display": "inline-block" });
     } else {
       this.$.image.updateStyles({ "display": "inline-block" });
-      this.$.image.width = isNaN( this.width ) ? parseInt( this.width, 10 ) : this.width;
-      this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;
+      if ( this.width ) {
+        this.$.image.width = isNaN( this.width ) ? parseInt( this.width, 10 ) : this.width;        
+      } else {
+        this.$.image.width = this.parentElement.clientWidth;
+      }
+      if ( this.height ) {
+        this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;        
+      } else {
+        this.$.image.height = this.parentElement.clientHeight;
+      }
       this.$.image.sizing = this.sizing;
       this.$.image.position = this.position;
     }
