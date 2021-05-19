@@ -49,9 +49,19 @@
       </template>
     </test-fixture>
 
+    <test-fixture id="test-block-auto-size">
+      <template>
+        <div style="width:400px;height:200px">
+          <rise-image
+            files="risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png">
+          </rise-image>
+        </div>
+      </template>
+    </test-fixture>
+
     <script>
       suite( "rise-image", () => {
-        let element;
+        let element, elementAutoSize;
 
         setup(() => {
           RisePlayerConfiguration.Logger = {
@@ -61,6 +71,7 @@
           };
 
           element = fixture("test-block");
+          elementAutoSize = fixture("test-block-auto-size").getElementsByTagName('rise-image')[0];
         });
 
         suite( "_isValidFilesString", () => {
@@ -258,6 +269,27 @@
 
             assert.isTrue( element._getDataUrlFromSVGLocalUrl.called );
           } );
+
+          suite( "auto-size:", () => {
+            setup( () => {
+              sinon.spy( elementAutoSize.$.image, "updateStyles" );
+            } );
+
+            teardown( () => {
+              elementAutoSize.$.image.updateStyles.restore();
+            } );
+
+            test( "should apply defaults and use parent width/height", () => {
+              elementAutoSize._renderImage( SAMPLE_PATH, SAMPLE_URL );
+
+              assert.isTrue(elementAutoSize.$.image.updateStyles.calledWith({"display": "inline-block"}));
+              assert.equal(elementAutoSize.$.image.width, 400);
+              assert.equal(elementAutoSize.$.image.height, 200);
+              assert.equal(elementAutoSize.$.image.sizing, "contain");
+              assert.equal(elementAutoSize.$.image.position, "center");
+
+            } );
+          });
         } );
 
         suite( "_getFileUrl", () => {
