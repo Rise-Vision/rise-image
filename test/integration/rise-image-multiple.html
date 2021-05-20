@@ -332,24 +332,31 @@
     });
 
     suite('running on preview or directly in browser', () => {
-      setup(() => {
+      setup((done) => {
         RisePlayerConfiguration.Helpers.isEditorPreview = () => true;
         RisePlayerConfiguration.Helpers.isInViewer = () => false;
+        RisePlayerConfiguration.Helpers.isDisplay = () => false;
+
+        sinon.stub(element, "_handleStartForPreview").callsFake(()=>{
+          element._handleStartForPreview.restore();
+          element._handleStartForPreview();
+          done();
+        })
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
       });
 
       teardown(() => {
         RisePlayerConfiguration.Helpers.isEditorPreview = () => false;
         RisePlayerConfiguration.Helpers.isInViewer = () => true;
+        RisePlayerConfiguration.Helpers.isDisplay = () => true;
       });
 
       test('it should render first image', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
         assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif?_=");
       });
 
       test('it should start transition timer for two images and show each for 5 seconds', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
 
         assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-7fa5ee92-7deb-450b-a8d5-e5ed648c575f/rise-image-demo/canadiens_logo.gif?_=");
 
@@ -363,8 +370,6 @@
       });
 
       test('it should transition all three images', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
         // emulate first two images cycle and first two images shown again in the following cycle
         clock.tick( 20000 );
 
