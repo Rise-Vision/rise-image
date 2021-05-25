@@ -244,19 +244,27 @@
     });
 
     suite('running on preview or directly in browser', () => {
-      setup(() => {
+      setup((done) => {
         RisePlayerConfiguration.Helpers.isEditorPreview = () => true;
         RisePlayerConfiguration.Helpers.isInViewer = () => false;
+        RisePlayerConfiguration.Helpers.isDisplay = () => false;
+
+        sinon.stub(element, "_handleStartForPreview").callsFake(()=>{
+          element._handleStartForPreview.restore();
+          element._handleStartForPreview();
+          done();
+        })
+
+        element.dispatchEvent( new CustomEvent( "start" ) );
       });
 
       teardown(() => {
         RisePlayerConfiguration.Helpers.isEditorPreview = () => false;
         RisePlayerConfiguration.Helpers.isInViewer = () => true;
+        RisePlayerConfiguration.Helpers.isDisplay = () => true;
       });
 
       test('it should render image with a cache bumper parameter', () => {
-        element.dispatchEvent( new CustomEvent( "start" ) );
-
         assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=");
       });
 

@@ -257,12 +257,12 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     } else {
       this.$.image.updateStyles({ "display": "inline-block" });
       if ( this.width ) {
-        this.$.image.width = isNaN( this.width ) ? parseInt( this.width, 10 ) : this.width;        
+        this.$.image.width = isNaN( this.width ) ? parseInt( this.width, 10 ) : this.width;
       } else {
         this.$.image.width = this.parentElement.clientWidth;
       }
       if ( this.height ) {
-        this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;        
+        this.$.image.height = isNaN( this.height ) ? parseInt( this.height, 10 ) : this.height;
       } else {
         this.$.image.height = this.parentElement.clientHeight;
       }
@@ -383,11 +383,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
     } else {
       this._validFiles = validFiles;
 
-      // account for the component running in editor preview OR running locally in browser
-      if ( RisePlayerConfiguration.Helpers.isEditorPreview() || !RisePlayerConfiguration.Helpers.isInViewer()) {
-        return this._handleStartForPreview();
-      }
-
       super.startWatch( validFiles )
         .then((watchType) => {
           this._watchType = watchType;
@@ -399,7 +394,6 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
             return this._startEmptyPlayUntilDoneTimer();
           }
 
-          // Special handling for schools applying Browser policy that disables SW feature in Browser (Content Sentinel)
           this._handleStartForPreview();
         });
     }
