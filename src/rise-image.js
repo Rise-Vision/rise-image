@@ -149,6 +149,41 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       timeOut.cancel( this._transitionTimer );
       this._transitionTimer = null;
       this._onShowImageComplete();
+
+      // --- additional logging to troubleshoot issue 98 ---
+
+      // fetch file manually and log the response
+      fetch(fileUrl)
+      .then(response => {
+        try {
+          const data = {
+            status: response.status,
+            statusText: response.statusText,
+          }
+  
+          // enumerate headers
+          response.headers.forEach((value, name) => {
+            data[name] = value;
+          });
+
+          //TODO: log data to BQ 
+          console.log(data);
+
+        } catch (error) {
+
+          //TODO: log error to BQ 
+          console.log(error);
+        }
+        return response.blob();
+      })
+      .then(blob => {
+          //TODO: log blob.size to BQ 
+          console.log(blob.size);
+      })
+      .catch(error => {
+          //TODO: log error to BQ 
+          console.log(error);
+      });
     });
 
     this.$.image.addEventListener( "loaded-changed", event => {
