@@ -159,12 +159,12 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
       if ( this._validFiles.length === 1 ) {
         // clear the image src value to ensure browser executes load of the same image again upon transition timer finishing
         this._clearDisplayedImage();
+      } else {
+        // cancel transition timer and move on to loading next image immediately
+        timeOut.cancel( this._transitionTimer );
+        this._transitionTimer = null;
+        this._onShowImageComplete();
       }
-
-      // cancel transition timer and move on to loading next image immediately
-      timeOut.cancel( this._transitionTimer );
-      this._transitionTimer = null;
-      this._onShowImageComplete();
     });
 
     this.$.image.addEventListener( "loaded-changed", event => {
