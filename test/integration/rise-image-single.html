@@ -100,7 +100,7 @@
         assert.equal(element.$.image.src, SAMPLE_URL2);
       });
 
-      /*test('it should not update files that were removed', () => {
+      test('it should not update files that were removed', () => {
         element.dispatchEvent( new CustomEvent( "start" ) );
 
         assert.equal(element.$.image.src, SAMPLE_URL);
@@ -151,11 +151,11 @@
           assert.isTrue(element._startEmptyPlayUntilDoneTimer.called);
           done();
         }, 200);
-      });*/
+      });
 
     });
 
-    /*suite('error', () => {
+    suite('error', () => {
       setup(() => {
         RisePlayerConfiguration.LocalStorage = {
           watchSingleFile: (file, handler) => {
@@ -252,7 +252,7 @@
         assert.equal(element.$.image.src, "https://storage.googleapis.com/risemedialibrary-30007b45-3df0-4c7b-9f7f-7d8ce6443013/logo.png?_=");
       });
 
-    });*/
+    });
   });
 
 </script>
