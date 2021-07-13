@@ -99,6 +99,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
     this._validFiles = [];
     this._filesToRenderList = [];
+    this._filesFailedToLoad = [];
     this._initialStart = true;
     this._transitionIndex = 0;
     this._transitionTimer = null;
@@ -124,31 +125,46 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
 
   _configureImageEventListeners() {
     this.$.image.addEventListener( "error-changed", ( event ) => {
-      // This value is the 'error' property of <iron-image> and indicates if the last set src failed to load.
-      const failed = event.detail.value;
-
-      if ( !failed ) {
-        // since it didn't fail, don't execute further
-        return;
-      }
-
       // to prevent test coverage failing
       if ( this._filesToRenderList.length === 0 ) {
         return;
       }
 
-      const filePath = this._filesToRenderList[ this._transitionIndex ].filePath,
+      // This value is the 'error' property of <iron-image> and indicates if the last set src failed to load.
+      const failed = event.detail.value,
+        filePath = this._filesToRenderList[ this._transitionIndex ].filePath,
         fileUrl = this._filesToRenderList[ this._transitionIndex ].fileUrl,
         errorCode = fileUrl && fileUrl.startsWith(RiseImage.STORAGE_PREFIX) ? "E000000011" : "E000000200";
 
-      super.log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", {errorCode}, {
-        storage: super.getStorageData( filePath, fileUrl )
-      });
-      this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
+      if ( !failed ) {
+        // if this file previously failed to load then remove it from the failed list
+        if ( this._filesFailedToLoad.indexOf( filePath ) > -1 ) {
+          this._filesFailedToLoad.splice( this._filesFailedToLoad.indexOf( filePath ), 1);
+        }
 
-      timeOut.cancel( this._transitionTimer );
-      this._transitionTimer = null;
-      this._onShowImageComplete();
+        // since it didn't fail, don't execute further
+        return;
+      }
+
+      if ( !this._filesFailedToLoad.includes( filePath )) {
+        // initial failure - don't log, instead add to list and allow for potential recovery on next load
+        this._filesFailedToLoad.push( filePath );
+      } else {
+        super.log( RiseImage.LOG_TYPE_ERROR, "image-load-fail", {errorCode}, {
+          storage: super.getStorageData( filePath, fileUrl )
+        });
+        this._sendImageEvent( RiseImage.EVENT_IMAGE_ERROR, { filePath, errorMessage: "image load failed" });
+      }
+
+      if ( this._validFiles.length === 1 ) {
+        // clear the image src value to ensure browser executes load of the same image again upon transition timer finishing
+        this._clearDisplayedImage();
+      } else {
+        // cancel transition timer and move on to loading next image immediately
+        timeOut.cancel( this._transitionTimer );
+        this._transitionTimer = null;
+        this._onShowImageComplete();
+      }
     });
 
     this.$.image.addEventListener( "loaded-changed", event => {
@@ -402,6 +418,7 @@ class RiseImage extends WatchFilesMixin( ValidFilesMixin( RiseElement )) {
   _stop() {
     this._validFiles = [];
     this._filesToRenderList = [];
+    this._filesFailedToLoad = [];
 
     super.stopWatch();
     this._clearFirstDownloadTimer();
