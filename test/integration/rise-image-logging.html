@@ -310,8 +310,13 @@
         }, 1000 );
     });
 
-    test("should log an 'image-load-fail'", () => {
+    test("should log an 'image-load-fail' upon more than one failure", () => {
         element.dispatchEvent( new CustomEvent( "start" ));
+
+        element.$.image.dispatchEvent( new CustomEvent( "error-changed", { detail: { value: true } } ));
+
+        // shouldn't log upon first failure
+        assert.isFalse(RisePlayerConfiguration.Logger.error.called);
 
         element.$.image.dispatchEvent( new CustomEvent( "error-changed", { detail: { value: true } } ));
 
